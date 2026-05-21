@@ -28,6 +28,16 @@ export function encontrarTopFragger(lista) {
   return top;
 }
 
+export function encontrarTopMVP(lista) {
+  let top = { nome: '', kills: 0, time: '' };
+  lista.forEach(time => {
+    if (time.mvp && time.mvp.nome && time.mvp.kills > top.kills) {
+      top = { nome: time.mvp.nome, kills: time.mvp.kills, time: time.nome };
+    }
+  });
+  return top;
+}
+
 export function processarDadosDoDia(dadosDoDia) {
   let resumoTimes = {};
   let totalKillsGeral = 0;
