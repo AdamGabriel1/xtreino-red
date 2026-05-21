@@ -48,26 +48,9 @@ export function TorneioProvider({ children }) {
       setDiaSelecionado(dias[dias.length - 1]);
     }
   }, [mesSelecionado, dias]);
-  
-  // Times fixos do XTreino - vem do arquivo de config
-  const [slots, setSlots] = useState(TIMES_XTREINO);
-  const config = CONFIG_XTREINO;
 
-  const meses = useMemo(() => {
-    return [...new Set(dados.map(item => item.Mes?.trim()).filter(Boolean))];
-  }, [dados]);
+  // ... (resto do contexto permanece igual: slots, helpers, etc.)
 
-  const dias = useMemo(() => {
-    if (!mesSelecionado) return [];
-    return [...new Set(
-      dados
-        .filter(item => item.Mes?.trim() === mesSelecionado)
-        .map(item => item.Dia?.trim())
-        .filter(Boolean)
-    )];
-  }, [dados, mesSelecionado]);
-
-  // Helpers para manipular slots
   const atualizarSlot = (id, nome) => {
     setSlots(prev => prev.map(s => 
       s.id === id ? { ...s, nome: nome.trim(), status: nome.trim() ? 'confirmado' : 'vazio' } : s
