@@ -1,4 +1,4 @@
-// Configuração de times com cores e links Xtreino
+// Configuracao de times com cores e links Xtreino
 export const TIMES_CONFIG = {
   'UGD': {
     cor: '#FF6B35',
@@ -35,7 +35,7 @@ export const TIMES_CONFIG = {
     xtreino: 'https://xtreino.gg/time/time-e',
     logo: null,
   },
-  // Fallback para times não cadastrados
+  // Fallback para times nao cadastrados
   'default': {
     cor: '#6C757D',
     xtreino: null,
@@ -43,16 +43,16 @@ export const TIMES_CONFIG = {
   }
 };
 
-// Função para obter configuração do time (com fallback)
+// Funcao para obter configuracao do time (com fallback)
 export function getTeamConfig(nomeTime) {
   if (!nomeTime) return TIMES_CONFIG.default;
 
-  // Procura correspondência exata
+  // Procura correspondencia exata
   if (TIMES_CONFIG[nomeTime]) {
     return TIMES_CONFIG[nomeTime];
   }
 
-  // Procura correspondência parcial (case-insensitive)
+  // Procura correspondencia parcial (case-insensitive)
   const nomeLower = nomeTime.toLowerCase();
   const chaveEncontrada = Object.keys(TIMES_CONFIG).find(
     key => key !== 'default' && key.toLowerCase() === nomeLower
@@ -65,7 +65,7 @@ export function getTeamConfig(nomeTime) {
   return TIMES_CONFIG.default;
 }
 
-// Função para gerar avatar com iniciais do time
+// Funcao para gerar avatar com iniciais do time
 export function gerarAvatarTime(nomeTime, cor) {
   if (!nomeTime) {
     return {
@@ -101,7 +101,7 @@ export function gerarAvatarTime(nomeTime, cor) {
   };
 }
 
-// Função para gerar cor baseada no nome (hash consistente)
+// Funcao para gerar cor baseada no nome (hash consistente)
 export function gerarCorTime(nomeTime) {
   if (!nomeTime) return '#6C757D';
 

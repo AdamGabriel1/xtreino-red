@@ -19,8 +19,8 @@ export default function TabelaDevils() {
     if (abaAtiva === 'geral') {
       return b.pt - a.pt || b.total_pk - a.total_pk;
     }
-    const scoreA = a[`${abaAtiva}_pp`] + a[`${abaAtiva}_kills`];
-    const scoreB = b[`${abaAtiva}_pp`] + b[`${abaAtiva}_kills`];
+    const scoreA = (a[`${abaAtiva}_pp`] || 0) + (a[`${abaAtiva}_pos`] || 0);
+    const scoreB = (b[`${abaAtiva}_pp`] || 0) + (b[`${abaAtiva}_pos`] || 0);
     return scoreB - scoreA;
   });
 
@@ -66,15 +66,17 @@ export default function TabelaDevils() {
                 <th className="th-equipe">Equipe</th>
                 {isGeral && (
                   <>
-                    <th className="th-queda col-queda">Q1 (PP/PK)</th>
-                    <th className="th-queda col-queda">Q2 (PP/PK)</th>
-                    <th className="th-queda col-queda">Q3 (PP/PK)</th>
+                    <th className="th-queda col-queda">Q1 (Pos/K)</th>
+                    <th className="th-queda col-queda">Q2 (Pos/K)</th>
+                    <th className="th-queda col-queda">Q3 (Pos/K)</th>
                     <th className="th-total">Total PP</th>
                     <th className="th-total">Total PK</th>
+                    <th className="th-total">🏆</th>
                   </>
                 )}
                 {!isGeral && (
                   <>
+                    <th className="th-queda">Posição</th>
                     <th className="th-queda">PP</th>
                     <th className="th-queda">Kills</th>
                   </>
@@ -85,7 +87,7 @@ export default function TabelaDevils() {
             <tbody>
               {equipesOrdenadas.length === 0 ? (
                 <tr>
-                  <td colSpan={isGeral ? 8 : 5} className="td-empty">
+                  <td colSpan={isGeral ? 9 : 6} className="td-empty">
                     <div className="empty-state-devils">
                       <i className="fa-solid fa-table-cells text-2xl text-gray-600"></i>
                       <p>Nenhum dado disponível para esta data</p>
@@ -155,27 +157,35 @@ function TabelaRow({ equipe, index, modo, isGeral }) {
       {isGeral ? (
         <>
           <td className="td-queda col-queda">
-            <span className="pp-value">{equipe.q1_pp}</span>
+            <span className="pos-value">{equipe.q1_pos}º</span>
             <span className="sep">/</span>
-            <span className="pk-value">{equipe.q1_kills}</span>
+            <span className="pk-value">{equipe.total_pk > 0 ? Math.round((equipe.q1_k / equipe.total_pk) * equipe.total_pk) : 0}k</span>
           </td>
           <td className="td-queda col-queda">
-            <span className="pp-value">{equipe.q2_pp}</span>
+            <span className="pos-value">{equipe.q2_pos}º</span>
             <span className="sep">/</span>
-            <span className="pk-value">{equipe.q2_kills}</span>
+            <span className="pk-value">{equipe.q2_k || 0}k</span>
           </td>
           <td className="td-queda col-queda">
-            <span className="pp-value">{equipe.q3_pp}</span>
+            <span className="pos-value">{equipe.q3_pos}º</span>
             <span className="sep">/</span>
-            <span className="pk-value">{equipe.q3_kills}</span>
+            <span className="pk-value">{equipe.q3_k || 0}k</span>
           </td>
           <td className="td-total">{equipe.total_pp}</td>
           <td className="td-total pk-total">{equipe.total_pk}</td>
+          <td className="td-total">
+            {equipe.strikes > 0 && (
+              <span style={{ color: 'var(--gold)', fontWeight: 'bold' }}>
+                {equipe.strikes}x 🏆
+              </span>
+            )}
+          </td>
         </>
       ) : (
         <>
+          <td className="td-queda">{equipe[`${modo}_pos`]}º</td>
           <td className="td-queda">{equipe[`${modo}_pp`]} PP</td>
-          <td className="td-queda pk-value">{equipe[`${modo}_kills`]} Kills</td>
+          <td className="td-queda pk-value">{equipe[`${modo}_k`]} Kills</td>
         </>
       )}
 
