@@ -1,7 +1,7 @@
 import { useTorneio } from '../context/TorneioContext.jsx';
 
 export default function Header() {
-  const { temaEscuro, setTemaEscuro } = useTorneio();
+  const { config, temaEscuro, setTemaEscuro } = useTorneio();
 
   const toggleTheme = () => {
     setTemaEscuro(!temaEscuro);
