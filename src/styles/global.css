@@ -1,0 +1,96 @@
+:root {
+  --bg-principal: #0a0b0f;
+  --bg-card: #11131a;
+  --bg-card-hover: #161924;
+  --cor-accent: #ff4655;
+  --cor-accent-hover: #ff5c6a;
+  --cor-accent-glow: rgba(255, 70, 85, 0.3);
+  --cor-texto: #e4e6eb;
+  --cor-subtexto: #8b95a5;
+  --borda: #1e2230;
+  --borda-hover: #2a3050;
+  --gold: #ffb703;
+  --silver: #c0c0c0;
+  --bronze: #cd7f32;
+  --success: #00d26a;
+  --info: #00b4d8;
+  --gradient-header: linear-gradient(135deg, #1a0f12 0%, #0d0e12 50%, #11131a 100%);
+}
+
+[data-theme="light"] {
+  --bg-principal: #f0f2f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8f9fa;
+  --cor-texto: #1a1a2e;
+  --cor-subtexto: #6b7280;
+  --borda: #e5e7eb;
+  --borda-hover: #d1d5db;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-principal);
+  color: var(--cor-texto);
+  font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--cor-accent-glow); }
+  50% { transform: scale(1.05); box-shadow: 0 0 30px var(--cor-accent-glow); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+}
