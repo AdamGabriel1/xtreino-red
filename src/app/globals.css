@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  --devil-red: #dc2626;
+  --devil-dark: #0a0a0a;
+  --devil-card: #171717;
+  --devil-border: #262626;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--devil-dark);
+  color: #e5e5e5;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--devil-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--devil-red);
+  border-radius: 4px;
+}
+
+.devil-gradient {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+}
+
+.devil-card {
+  background: var(--devil-card);
+  border: 1px solid var(--devil-border);
+  border-radius: 12px;
+}
+
+.devil-input {
+  background: #262626;
+  border: 1px solid #404040;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.devil-input:focus {
+  border-color: #dc2626;
+}
+
+.devil-btn {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  color: white;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.devil-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(220, 38, 38, 0.5);
+}
+
+.devil-btn:active {
+  transform: translateY(0);
+}
