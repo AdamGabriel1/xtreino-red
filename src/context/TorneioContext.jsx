@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useMemo } from 'react';
 import { useCSVData } from '../hooks/useCSVData.js';
-import { TIMES_XTREINO, CONFIG_XTREINO } from 'data/timesFixos.js';
+import { TIMES_XTREINO, CONFIG_XTREINO } from '/data/timesFixos.js';
 
 const TorneioContext = createContext(null);
 
