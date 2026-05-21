@@ -9,14 +9,13 @@ export default function TimesGrid() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroTime, setFiltroTime] = useState('todos');
 
-  // Filtrar times
   const timesFiltrados = listaFinal.filter(time => {
     const matchTime = time.nome.toLowerCase().includes(searchTerm.toLowerCase());
     const matchPlayer = time.jogadores.some(j => j.nome.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchTime || matchPlayer;
   });
 
-  // Montar lista plana de todos os jogadores com info do time
+  // Lista plana de jogadores com info do time
   const todosJogadores = timesFiltrados.flatMap(time => 
     time.jogadores.map(j => ({
       ...j,
@@ -27,7 +26,6 @@ export default function TimesGrid() {
     }))
   ).sort((a, b) => b.total_kills - a.total_kills);
 
-  // Filtrar jogadores por time se selecionado
   const jogadoresFiltrados = filtroTime === 'todos' 
     ? todosJogadores 
     : todosJogadores.filter(j => j.timeNome === filtroTime);
@@ -35,7 +33,7 @@ export default function TimesGrid() {
   return (
     <>
       <div className="section-title">
-        <span>👥</span> Análise de Elencos
+        <span>👥</span> Analise de Elencos
         <span className="line"></span>
       </div>
 
@@ -53,27 +51,30 @@ export default function TimesGrid() {
       <h3 style={{ margin: '20px 0 12px', fontFamily: "'Orbitron', sans-serif", fontSize: '1rem', color: 'var(--gold)' }}>
         🏆 Ranking de Times
       </h3>
-      
+
       <div className="table-responsive">
         <table className="tabela-times">
           <thead>
             <tr>
               <th style={{ width: '50px' }}>Pos</th>
               <th>Time</th>
-              <th>Q1</th>
-              <th>Q2</th>
-              <th>Q3</th>
+              <th>Q1 Pos</th>
+              <th>Q1 Kills</th>
+              <th>Q2 Pos</th>
+              <th>Q2 Kills</th>
+              <th>Q3 Pos</th>
+              <th>Q3 Kills</th>
               <th>Total PP</th>
               <th>Total PK</th>
               <th>🏆</th>
-              <th>Pos Média</th>
+              <th>Pos Media</th>
               <th>PT</th>
             </tr>
           </thead>
           <tbody>
             {timesFiltrados.length === 0 ? (
               <tr>
-                <td colSpan={10} className="td-empty">
+                <td colSpan={13} className="td-empty">
                   <div className="empty-state">
                     <div className="icon">📭</div>
                     <p>Nenhum time encontrado</p>
@@ -127,9 +128,12 @@ export default function TimesGrid() {
                         </div>
                       </div>
                     </td>
-                    <td><strong>{time.q1_pos}º</strong> <span style={{ color: 'var(--gray)', fontSize: '0.8rem' }}>({time.q1_pp}pp)</span></td>
-                    <td><strong>{time.q2_pos}º</strong> <span style={{ color: 'var(--gray)', fontSize: '0.8rem' }}>({time.q2_pp}pp)</span></td>
-                    <td><strong>{time.q3_pos}º</strong> <span style={{ color: 'var(--gray)', fontSize: '0.8rem' }}>({time.q3_pp}pp)</span></td>
+                    <td><strong>{time.q1_pos}º</strong></td>
+                    <td><span style={{ color: 'var(--info)', fontWeight: '600' }}>{time.q1_kills_time}</span></td>
+                    <td><strong>{time.q2_pos}º</strong></td>
+                    <td><span style={{ color: 'var(--info)', fontWeight: '600' }}>{time.q2_kills_time}</span></td>
+                    <td><strong>{time.q3_pos}º</strong></td>
+                    <td><span style={{ color: 'var(--info)', fontWeight: '600' }}>{time.q3_kills_time}</span></td>
                     <td><strong style={{ color: 'var(--gold)' }}>{time.total_pp}</strong></td>
                     <td className="destaque-kill"><strong>{time.total_pk}</strong></td>
                     <td>
@@ -154,8 +158,7 @@ export default function TimesGrid() {
         <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1rem', color: 'var(--info)', margin: 0 }}>
           ⚔️ Ranking de Jogadores
         </h3>
-        
-        {/* Filtro por time */}
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <label style={{ fontSize: '0.85rem', color: 'var(--gray)' }}>Filtrar por time:</label>
           <select 
@@ -208,7 +211,7 @@ export default function TimesGrid() {
               jogadoresFiltrados.map((j, index) => {
                 const posClass = index === 0 ? 'pos-1' : index === 1 ? 'pos-2' : index === 2 ? 'pos-3' : 'pos-other';
                 const config = getTeamConfig(j.timeNome);
-                
+
                 return (
                   <tr key={`${j.timeNome}-${j.nome}`}>
                     <td><span className={`pos-badge ${posClass}`}>{index + 1}</span></td>
@@ -246,9 +249,9 @@ export default function TimesGrid() {
                         <span style={{ fontSize: '0.7rem', color: 'var(--gray)' }}>({j.timePosicao}º)</span>
                       </div>
                     </td>
-                    <td>{j.q1_k || 0}</td>
-                    <td>{j.q2_k || 0}</td>
-                    <td>{j.q3_k || 0}</td>
+                    <td>{j.q1_kills || 0}</td>
+                    <td>{j.q2_kills || 0}</td>
+                    <td>{j.q3_kills || 0}</td>
                     <td><strong style={{ color: 'var(--gold)', fontSize: '1.05rem' }}>{j.total_kills}</strong></td>
                     <td style={{ color: 'var(--gray)', fontSize: '0.85rem' }}>{j.dano || 'N/A'}</td>
                     <td>
@@ -266,7 +269,7 @@ export default function TimesGrid() {
         </table>
       </div>
 
-      {/* Resumo estatístico */}
+      {/* Resumo estatistico */}
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 

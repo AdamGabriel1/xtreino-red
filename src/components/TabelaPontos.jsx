@@ -36,7 +36,7 @@ export default function TabelaPontos() {
   return (
     <>
       <div className="section-title">
-        <span>📊</span> Classificação Completa
+        <span>📊</span> Classificacao de Times
         <span className="line"></span>
       </div>
 
@@ -61,11 +61,11 @@ export default function TabelaPontos() {
             {dias.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
         </div>
-        <small className="info-text">* Dados puxados automaticamente do banco dados.csv</small>
+        <small className="info-text">* Dados do campeonato.csv</small>
       </div>
 
       <h2 style={{ marginBottom: '15px', fontFamily: "'Orbitron', sans-serif", fontSize: '1.1rem' }}>
-        Classificação - {diaSelecionado} de {mesSelecionado}
+        Classificacao - {diaSelecionado} de {mesSelecionado}
       </h2>
 
       {listaFinal.length === 0 ? (
@@ -75,21 +75,22 @@ export default function TabelaPontos() {
         </div>
       ) : (
         <div className="table-responsive">
-          <table className="tabela-completa">
+          <table className="tabela-pontos">
             <thead>
               <tr>
                 <th style={{ width: '50px' }}>Pos</th>
                 <th>Time</th>
-                <th className="tooltip" data-tooltip="Pontos de Posição Queda 1">Q1 PP</th>
-                <th className="tooltip" data-tooltip="Kills Queda 1">Q1 PK</th>
-                <th className="tooltip" data-tooltip="Pontos de Posição Queda 2">Q2 PP</th>
-                <th className="tooltip" data-tooltip="Kills Queda 2">Q2 PK</th>
-                <th className="tooltip" data-tooltip="Pontos de Posição Queda 3">Q3 PP</th>
-                <th className="tooltip" data-tooltip="Kills Queda 3">Q3 PK</th>
-                <th className="tooltip" data-tooltip="Total de Pontos de Posição">Total PP</th>
-                <th className="tooltip" data-tooltip="Total de Kills">Total PK</th>
+                <th className="tooltip" data-tooltip="Posicao Queda 1">Q1 Pos</th>
+                <th className="tooltip" data-tooltip="Kills time Queda 1 (soma)">Q1 Kills</th>
+                <th className="tooltip" data-tooltip="Posicao Queda 2">Q2 Pos</th>
+                <th className="tooltip" data-tooltip="Kills time Queda 2 (soma)">Q2 Kills</th>
+                <th className="tooltip" data-tooltip="Posicao Queda 3">Q3 Pos</th>
+                <th className="tooltip" data-tooltip="Kills time Queda 3 (soma)">Q3 Kills</th>
+                <th className="tooltip" data-tooltip="Total Pontos Posicao">Total PP</th>
+                <th className="tooltip" data-tooltip="Total Kills Time">Total PK</th>
+                <th className="tooltip" data-tooltip="Booyahs">🏆</th>
                 <th className="tooltip" data-tooltip="Jogadores">👥</th>
-                <th className="tooltip" data-tooltip="Pontuação Final">PT</th>
+                <th className="tooltip" data-tooltip="Pontuacao Final">PT</th>
                 <th style={{ width: '40px' }}></th>
               </tr>
             </thead>
@@ -101,15 +102,13 @@ export default function TabelaPontos() {
                 const avatar = gerarAvatarTime(time.nome, config.cor);
                 const expandido = timeExpandido === time.nome;
 
-                // Ordenar jogadores por kills
                 const jogadoresOrdenados = [...time.jogadores].sort((a, b) => b.total_kills - a.total_kills);
-                const topKill = jogadoresOrdenados[0];
-                const mvpDoTime = jogadoresOrdenados.reduce((prev, curr) => (curr.mvp > prev.mvp ? curr : prev), jogadoresOrdenados[0]);
+                const mvpDoTime = jogadoresOrdenados[0];
 
                 return (
                   <>
                     <tr 
-                      key={time.nome} 
+                      key={time.nome}
                       className={`time-row ${expandido ? 'expandido' : ''}`}
                       onClick={() => toggleExpand(time.nome)}
                       style={{ cursor: 'pointer' }}
@@ -118,7 +117,6 @@ export default function TabelaPontos() {
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <div 
-                            className="team-logo-small"
                             style={{
                               width: '36px',
                               height: '36px',
@@ -137,6 +135,9 @@ export default function TabelaPontos() {
                           </div>
                           <div>
                             <strong style={{ fontSize: '0.95rem' }}>{time.nome}</strong>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--gray)' }}>
+                              Pos Media: {time.posicao_media} | MVP: {mvpDoTime?.nome?.split(' ')[0] || '-'}
+                            </div>
                             {config.xtreino && (
                               <a 
                                 href={config.xtreino} 
@@ -144,11 +145,9 @@ export default function TabelaPontos() {
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
                                 style={{ 
-                                  display: 'block', 
                                   fontSize: '0.7rem', 
                                   color: 'var(--info)',
-                                  textDecoration: 'none',
-                                  marginTop: '2px'
+                                  textDecoration: 'none'
                                 }}
                               >
                                 🔗 Xtreino
@@ -157,21 +156,23 @@ export default function TabelaPontos() {
                           </div>
                         </div>
                       </td>
-                      <td>{time.q1_pp}</td>
-                      <td>{time.q1_kills}</td>
-                      <td>{time.q2_pp}</td>
-                      <td>{time.q2_kills}</td>
-                      <td>{time.q3_pp}</td>
-                      <td>{time.q3_kills}</td>
+                      <td><strong>{time.q1_pos}º</strong></td>
+                      <td><span style={{ color: 'var(--info)', fontWeight: '600' }}>{time.q1_kills_time}</span></td>
+                      <td><strong>{time.q2_pos}º</strong></td>
+                      <td><span style={{ color: 'var(--info)', fontWeight: '600' }}>{time.q2_kills_time}</span></td>
+                      <td><strong>{time.q3_pos}º</strong></td>
+                      <td><span style={{ color: 'var(--info)', fontWeight: '600' }}>{time.q3_kills_time}</span></td>
                       <td><strong style={{ color: 'var(--gold)' }}>{time.total_pp}</strong></td>
                       <td className="destaque-kill"><strong>{time.total_pk}</strong></td>
                       <td>
-                        <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>
-                          {time.jogadores.length}
-                        </span>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--gray)', marginTop: '2px' }}>
-                          🏅 {mvpDoTime?.nome?.split(' ')[0] || '-'}
-                        </div>
+                        {time.strikes > 0 ? (
+                          <span style={{ color: 'var(--gold)', fontWeight: 'bold' }}>{time.strikes}x 🏆</span>
+                        ) : (
+                          <span style={{ color: 'var(--gray)' }}>-</span>
+                        )}
+                      </td>
+                      <td>
+                        <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>{time.jogadores.length}</span>
                       </td>
                       <td>
                         <span className="destaque-total" style={{ fontSize: '1rem' }}>{time.pt} pts</span>
@@ -191,28 +192,24 @@ export default function TabelaPontos() {
                       </td>
                     </tr>
 
-                    {/* Expanded row with player details */}
                     {expandido && (
                       <tr className="detalhes-row">
-                        <td colSpan={13} style={{ padding: 0, border: 'none' }}>
-                          <div className="detalhes-time" style={{
+                        <td colSpan={14} style={{ padding: 0, border: 'none' }}>
+                          <div style={{
                             background: 'rgba(0,0,0,0.2)',
                             padding: '15px 20px',
                             borderLeft: `3px solid ${config.cor}`,
                           }}>
                             <div style={{ marginBottom: '12px', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                               <span style={{ fontSize: '0.85rem', color: 'var(--gold)' }}>
-                                <strong>🏆 Top Killer:</strong> {topKill?.nome} ({topKill?.total_kills} kills)
+                                <strong>🏆 Top Killer:</strong> {mvpDoTime?.nome} ({mvpDoTime?.total_kills} kills)
                               </span>
                               <span style={{ fontSize: '0.85rem', color: 'var(--info)' }}>
-                                <strong>⭐ MVP do Time:</strong> {mvpDoTime?.nome} ({mvpDoTime?.mvp} MVPs)
-                              </span>
-                              <span style={{ fontSize: '0.85rem', color: 'var(--cor-accent)' }}>
-                                <strong>💥 Dano Total:</strong> {time.jogadores.reduce((sum, j) => sum + (parseInt(j.dano) || 0), 0).toLocaleString()}
+                                <strong>📊 Posicao Media:</strong> {time.posicao_media}
                               </span>
                             </div>
 
-                            <table className="tabela-jogadores" style={{ width: '100%', fontSize: '0.85rem' }}>
+                            <table style={{ width: '100%', fontSize: '0.85rem' }}>
                               <thead>
                                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                                   <th style={{ textAlign: 'left', padding: '8px' }}>Jogador</th>
@@ -239,15 +236,28 @@ export default function TabelaPontos() {
                                       </span>
                                       <span style={{ fontWeight: idx === 0 ? 'bold' : 'normal' }}>
                                         {j.nome}
-                                        {idx === 0 && <span style={{ fontSize: '0.65rem', marginLeft: '6px', color: 'var(--gold)', background: 'rgba(255,215,0,0.15)', padding: '2px 6px', borderRadius: '4px' }}>TOP KILL</span>}
+                                        {idx === 0 && (
+                                          <span style={{ 
+                                            fontSize: '0.65rem', 
+                                            marginLeft: '6px', 
+                                            color: 'var(--gold)', 
+                                            background: 'rgba(255,215,0,0.15)', 
+                                            padding: '2px 6px', 
+                                            borderRadius: '4px' 
+                                          }}>
+                                            TOP KILL
+                                          </span>
+                                        )}
                                       </span>
                                     </td>
                                     <td style={{ textAlign: 'center', padding: '8px' }}>{j.q1_kills || 0}</td>
                                     <td style={{ textAlign: 'center', padding: '8px' }}>{j.q2_kills || 0}</td>
                                     <td style={{ textAlign: 'center', padding: '8px' }}>{j.q3_kills || 0}</td>
                                     <td style={{ textAlign: 'center', padding: '8px', fontWeight: 'bold', color: 'var(--gold)' }}>{j.total_kills}</td>
-                                    <td style={{ textAlign: 'center', padding: '8px' }}>{j.dano?.toLocaleString() || 0}</td>
-                                    <td style={{ textAlign: 'center', padding: '8px', color: 'var(--info)', fontWeight: 'bold' }}>{j.mvp || 0}</td>
+                                    <td style={{ textAlign: 'center', padding: '8px' }}>{j.dano || '-'}</td>
+                                    <td style={{ textAlign: 'center', padding: '8px', color: 'var(--info)', fontWeight: 'bold' }}>
+                                      {j.mvp > 0 ? '✅' : '-'}
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>

@@ -4,7 +4,7 @@ import { usePontuacao } from '../hooks/usePontuacao.js';
 import { getTeamConfig, gerarAvatarTime } from '../data/teamConfig.js';
 
 const TABS = [
-  { id: 'geral', label: 'Pontuação Geral', icon: 'fa-ranking-star' },
+  { id: 'geral', label: 'Pontuacao Geral', icon: 'fa-ranking-star' },
   { id: 'q1', label: '1ª Ilha', icon: 'fa-1' },
   { id: 'q2', label: '2ª Ilha', icon: 'fa-2' },
   { id: 'q3', label: '3ª Ilha', icon: 'fa-3' },
@@ -19,9 +19,8 @@ export default function TabelaDevils() {
     if (abaAtiva === 'geral') {
       return b.pt - a.pt || b.total_pk - a.total_pk;
     }
-    const scoreA = (a[`${abaAtiva}_pp`] || 0) + (a[`${abaAtiva}_pos`] || 0);
-    const scoreB = (b[`${abaAtiva}_pp`] || 0) + (b[`${abaAtiva}_pos`] || 0);
-    return scoreB - scoreA;
+    // Ordenar por posicao na queda (menor posicao = melhor)
+    return (a[`${abaAtiva}_pos`] || 99) - (b[`${abaAtiva}_pos`] || 99);
   });
 
   const isGeral = abaAtiva === 'geral';
@@ -31,10 +30,10 @@ export default function TabelaDevils() {
       <div className="tabela-header-devils">
         <div>
           <h2 className="tabela-title-devils">
-            <i className="fa-solid fa-table"></i> Tabela Parcial Diária
+            <i className="fa-solid fa-table"></i> Tabela Parcial Diaria
           </h2>
           <p className="tabela-subtitle-devils">
-            Pontuação Base: 1º=12pt, 2º=10pt, 3º=8pt, 4º=7pt... + 1 ponto por Eliminação (Kill).
+            Pontuacao Base: 1º=12pt, 2º=10pt, 3º=8pt, 4º=7pt... + 1 ponto por Eliminacao (Kill).
           </p>
         </div>
         <div className="tabela-count-devils">
@@ -64,21 +63,23 @@ export default function TabelaDevils() {
               <tr>
                 <th className="th-pos">Pos</th>
                 <th className="th-equipe">Equipe</th>
-                {isGeral && (
+                {isGeral ? (
                   <>
-                    <th className="th-queda col-queda">Q1 (Pos/K)</th>
-                    <th className="th-queda col-queda">Q2 (Pos/K)</th>
-                    <th className="th-queda col-queda">Q3 (Pos/K)</th>
+                    <th className="th-queda">Q1 Pos</th>
+                    <th className="th-queda">Q1 Kills</th>
+                    <th className="th-queda">Q2 Pos</th>
+                    <th className="th-queda">Q2 Kills</th>
+                    <th className="th-queda">Q3 Pos</th>
+                    <th className="th-queda">Q3 Kills</th>
                     <th className="th-total">Total PP</th>
                     <th className="th-total">Total PK</th>
                     <th className="th-total">🏆</th>
                   </>
-                )}
-                {!isGeral && (
+                ) : (
                   <>
-                    <th className="th-queda">Posição</th>
+                    <th className="th-queda">Posicao</th>
                     <th className="th-queda">PP</th>
-                    <th className="th-queda">Kills</th>
+                    <th className="th-queda">Kills Time</th>
                   </>
                 )}
                 <th className="th-pt">PT (Total)</th>
@@ -87,10 +88,10 @@ export default function TabelaDevils() {
             <tbody>
               {equipesOrdenadas.length === 0 ? (
                 <tr>
-                  <td colSpan={isGeral ? 9 : 6} className="td-empty">
+                  <td colSpan={isGeral ? 12 : 6} className="td-empty">
                     <div className="empty-state-devils">
                       <i className="fa-solid fa-table-cells text-2xl text-gray-600"></i>
-                      <p>Nenhum dado disponível para esta data</p>
+                      <p>Nenhum dado disponivel para esta data</p>
                     </div>
                   </td>
                 </tr>
@@ -156,20 +157,17 @@ function TabelaRow({ equipe, index, modo, isGeral }) {
 
       {isGeral ? (
         <>
-          <td className="td-queda col-queda">
-            <span className="pos-value">{equipe.q1_pos}º</span>
-            <span className="sep">/</span>
-            <span className="pk-value">{equipe.total_pk > 0 ? Math.round((equipe.q1_k / equipe.total_pk) * equipe.total_pk) : 0}k</span>
+          <td className="td-queda">{equipe.q1_pos}º</td>
+          <td className="td-queda">
+            <span className="pk-value">{equipe.q1_kills_time}</span>
           </td>
-          <td className="td-queda col-queda">
-            <span className="pos-value">{equipe.q2_pos}º</span>
-            <span className="sep">/</span>
-            <span className="pk-value">{equipe.q2_k || 0}k</span>
+          <td className="td-queda">{equipe.q2_pos}º</td>
+          <td className="td-queda">
+            <span className="pk-value">{equipe.q2_kills_time}</span>
           </td>
-          <td className="td-queda col-queda">
-            <span className="pos-value">{equipe.q3_pos}º</span>
-            <span className="sep">/</span>
-            <span className="pk-value">{equipe.q3_k || 0}k</span>
+          <td className="td-queda">{equipe.q3_pos}º</td>
+          <td className="td-queda">
+            <span className="pk-value">{equipe.q3_kills_time}</span>
           </td>
           <td className="td-total">{equipe.total_pp}</td>
           <td className="td-total pk-total">{equipe.total_pk}</td>
@@ -185,7 +183,7 @@ function TabelaRow({ equipe, index, modo, isGeral }) {
         <>
           <td className="td-queda">{equipe[`${modo}_pos`]}º</td>
           <td className="td-queda">{equipe[`${modo}_pp`]} PP</td>
-          <td className="td-queda pk-value">{equipe[`${modo}_k`]} Kills</td>
+          <td className="td-queda pk-value">{equipe[`${modo}_kills_time`]} Kills</td>
         </>
       )}
 
