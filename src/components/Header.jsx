@@ -1,5 +1,4 @@
-import React from 'react';
-import { useTorneio } from '../context/TorneioContext';
+import { useTorneio } from '../context/TorneioContext.jsx';
 
 export default function Header() {
   const { temaEscuro, setTemaEscuro } = useTorneio();

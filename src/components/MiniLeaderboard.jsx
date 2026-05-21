@@ -1,11 +1,9 @@
-import React from 'react';
-
 export default function MiniLeaderboard({ top3 }) {
   if (top3.length === 0) {
     return (
       <div className="empty-state">
         <div className="icon">📊</div>
-        <p>Selecione um dia na aba "Tabela do Dia" para ver o ranking</p>
+        <p>Selecione um dia na aba &quot;Tabela do Dia&quot; para ver o ranking</p>
       </div>
     );
   }

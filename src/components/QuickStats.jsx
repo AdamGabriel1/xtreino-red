@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function QuickStats({ totalTimes, totalJogadores, totalKills }) {
   const stats = [
     { number: totalTimes, label: 'Times' },

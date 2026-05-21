@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { processarDadosDoDia } from '../utils/calculos';
+import { processarDadosDoDia } from '../utils/calculos.js';
 
 export function usePontuacao(dadosGlobais, mesSelecionado, diaSelecionado) {
   return useMemo(() => {

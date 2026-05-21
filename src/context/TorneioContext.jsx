@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
-import { useCSVData } from '../hooks/useCSVData';
+import { createContext, useContext, useState, useMemo } from 'react';
+import { useCSVData } from '../hooks/useCSVData.js';
 
 const TorneioContext = createContext(null);
 

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useTorneio } from '../context/TorneioContext';
+import { useEffect } from 'react';
+import { useTorneio } from '../context/TorneioContext.jsx';
 
 const TABS = [
   { id: 'home', icon: '🏠', label: 'Início' },

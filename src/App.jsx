@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
-import { useTorneio } from './context/TorneioContext';
-import { usePontuacao } from './hooks/usePontuacao';
-import { encontrarMelhorTime, encontrarTopFragger, encontrarTopMVP } from './utils/calculos';
-import Header from './components/Header';
-import NavTabs from './components/NavTabs';
-import QuickStats from './components/QuickStats';
-import TabelaPontos from './components/TabelaPontos';
-import TimesGrid from './components/TimesGrid';
-import MiniLeaderboard from './components/MiniLeaderboard';
+import { useEffect } from 'react';
+import { useTorneio } from './context/TorneioContext.jsx';
+import { usePontuacao } from './hooks/usePontuacao.js';
+import { encontrarMelhorTime, encontrarTopFragger, encontrarTopMVP } from './utils/calculos.js';
+import Header from './components/Header.jsx';
+import NavTabs from './components/NavTabs.jsx';
+import QuickStats from './components/QuickStats.jsx';
+import TabelaPontos from './components/TabelaPontos.jsx';
+import TimesGrid from './components/TimesGrid.jsx';
+import MiniLeaderboard from './components/MiniLeaderboard.jsx';
 
 export default function App() {
   const { abaAtiva, dados, mesSelecionado, diaSelecionado, setMesSelecionado, setDiaSelecionado, meses, dias, loading, error } = useTorneio();

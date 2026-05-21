@@ -1,6 +1,5 @@
-import React from 'react';
-import { useTorneio } from '../context/TorneioContext';
-import { usePontuacao } from '../hooks/usePontuacao';
+import { useTorneio } from '../context/TorneioContext.jsx';
+import { usePontuacao } from '../hooks/usePontuacao.js';
 
 export default function TabelaPontos() {
   const { dados, mesSelecionado, setMesSelecionado, diaSelecionado, setDiaSelecionado, meses, dias, loading, error } = useTorneio();

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useTorneio } from '../context/TorneioContext';
-import { usePontuacao } from '../hooks/usePontuacao';
+import { useState } from 'react';
+import { useTorneio } from '../context/TorneioContext.jsx';
+import { usePontuacao } from '../hooks/usePontuacao.js';
 
 export default function TimesGrid() {
   const { dados, mesSelecionado, diaSelecionado } = useTorneio();
