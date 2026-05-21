@@ -7,17 +7,30 @@ export default function TimesGrid() {
   const { dados, mesSelecionado, diaSelecionado } = useTorneio();
   const { listaFinal } = usePontuacao(dados, mesSelecionado, diaSelecionado);
   const [searchTerm, setSearchTerm] = useState('');
-  const [timeExpandido, setTimeExpandido] = useState(null);
+  const [filtroTime, setFiltroTime] = useState('todos');
 
+  // Filtrar times
   const timesFiltrados = listaFinal.filter(time => {
     const matchTime = time.nome.toLowerCase().includes(searchTerm.toLowerCase());
     const matchPlayer = time.jogadores.some(j => j.nome.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchTime || matchPlayer;
   });
 
-  const toggleExpand = (nomeTime) => {
-    setTimeExpandido(timeExpandido === nomeTime ? null : nomeTime);
-  };
+  // Montar lista plana de todos os jogadores com info do time
+  const todosJogadores = timesFiltrados.flatMap(time => 
+    time.jogadores.map(j => ({
+      ...j,
+      timeNome: time.nome,
+      timeCor: getTeamConfig(time.nome).cor,
+      timePosicao: listaFinal.findIndex(t => t.nome === time.nome) + 1,
+      timePT: time.pt
+    }))
+  ).sort((a, b) => b.total_kills - a.total_kills);
+
+  // Filtrar jogadores por time se selecionado
+  const jogadoresFiltrados = filtroTime === 'todos' 
+    ? todosJogadores 
+    : todosJogadores.filter(j => j.timeNome === filtroTime);
 
   return (
     <>
@@ -36,162 +49,254 @@ export default function TimesGrid() {
         />
       </div>
 
-      <div className="grid-times">
-        {timesFiltrados.length === 0 ? (
-          <div className="empty-state">
-            <div className="icon">🔍</div>
-            <p>Nenhum time ou jogador encontrado</p>
-          </div>
-        ) : (
-          timesFiltrados.map((time, index) => {
-            const posicao = index + 1;
-            const posBadge = posicao <= 3 ? ['🥇', '🥈', '🥉'][posicao - 1] : `#${posicao}`;
-            const config = getTeamConfig(time.nome);
-            const avatar = gerarAvatarTime(time.nome, config.cor);
-            const expandido = timeExpandido === time.nome;
+      {/* ===== TABELA 1: TIMES ===== */}
+      <h3 style={{ margin: '20px 0 12px', fontFamily: "'Orbitron', sans-serif", fontSize: '1rem', color: 'var(--gold)' }}>
+        🏆 Ranking de Times
+      </h3>
+      
+      <div className="table-responsive">
+        <table className="tabela-times">
+          <thead>
+            <tr>
+              <th style={{ width: '50px' }}>Pos</th>
+              <th>Time</th>
+              <th>Q1</th>
+              <th>Q2</th>
+              <th>Q3</th>
+              <th>Total PP</th>
+              <th>Total PK</th>
+              <th>🏆</th>
+              <th>Pos Média</th>
+              <th>PT</th>
+            </tr>
+          </thead>
+          <tbody>
+            {timesFiltrados.length === 0 ? (
+              <tr>
+                <td colSpan={10} className="td-empty">
+                  <div className="empty-state">
+                    <div className="icon">📭</div>
+                    <p>Nenhum time encontrado</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              timesFiltrados.map((time, index) => {
+                const posClass = index === 0 ? 'pos-1' : index === 1 ? 'pos-2' : index === 2 ? 'pos-3' : 'pos-other';
+                const config = getTeamConfig(time.nome);
+                const avatar = gerarAvatarTime(time.nome, config.cor);
+                const topKill = [...time.jogadores].sort((a, b) => b.total_kills - a.total_kills)[0];
 
-            // Ordenar jogadores por kills (destacar top kill)
-            const jogadoresOrdenados = [...time.jogadores].sort((a, b) => b.total_kills - a.total_kills);
-            const mvpDoTime = jogadoresOrdenados[0];
-
-            return (
-              <div className="card" key={time.nome} data-team-name={time.nome.toLowerCase()}>
-                <div className="team-card-header" onClick={() => toggleExpand(time.nome)} style={{ cursor: 'pointer' }}>
-                  <div 
-                    className="team-logo"
-                    style={{
-                      background: `linear-gradient(135deg, ${config.cor}, ${config.cor}dd)`,
-                    }}
-                  >
-                    {avatar.iniciais}
-                  </div>
-                  <div className="team-info">
-                    <h4>{time.nome} <span style={{ fontSize: '0.9rem' }}>{posBadge}</span></h4>
-                    <div className="team-meta">
-                      {time.jogadores.length} jogadores | {time.total_pk} kills | {time.pt} pts
-                    </div>
-                  </div>
-                  <span style={{ 
-                    marginLeft: 'auto',
-                    transition: 'transform 0.2s',
-                    transform: expandido ? 'rotate(180deg)' : 'rotate(0deg)',
-                    fontSize: '1.2rem'
-                  }}>
-                    ▼
-                  </span>
-                </div>
-                
-                <div style={{ marginBottom: '12px', display: 'flex', gap: '15px', fontSize: '0.85rem', flexWrap: 'wrap' }}>
-                  <span style={{ color: 'var(--gold)' }}><strong>PP:</strong> {time.total_pp}</span>
-                  <span style={{ color: 'var(--info)' }}><strong>PK:</strong> {time.total_pk}</span>
-                  <span style={{ color: 'var(--cor-accent)' }}><strong>MVP:</strong> {mvpDoTime?.nome?.split(' ')[0] || '-'}</span>
-                  <span style={{ color: 'var(--success)' }}><strong>🏆:</strong> {time.strikes || 0}x</span>
-                  <span style={{ color: 'var(--gray)' }}><strong>Pos Média:</strong> {time.posicao_media}</span>
-                </div>
-
-                {/* Quedas summary */}
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(3, 1fr)', 
-                  gap: '8px', 
-                  marginBottom: '12px',
-                  fontSize: '0.75rem'
-                }}>
-                  <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '6px', textAlign: 'center' }}>
-                    <div style={{ color: 'var(--gray)', marginBottom: '2px' }}>Q1</div>
-                    <div><strong>{time.q1_pos}º</strong> | {time.q1_k || 0}k</div>
-                  </div>
-                  <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '6px', textAlign: 'center' }}>
-                    <div style={{ color: 'var(--gray)', marginBottom: '2px' }}>Q2</div>
-                    <div><strong>{time.q2_pos}º</strong> | {time.q2_k || 0}k</div>
-                  </div>
-                  <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '6px', textAlign: 'center' }}>
-                    <div style={{ color: 'var(--gray)', marginBottom: '2px' }}>Q3</div>
-                    <div><strong>{time.q3_pos}º</strong> | {time.q3_k || 0}k</div>
-                  </div>
-                </div>
-
-                {/* Xtreino link */}
-                {config.xtreino && (
-                  <div style={{ marginBottom: '12px' }}>
-                    <a 
-                      href={config.xtreino} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{ 
-                        fontSize: '0.8rem', 
-                        color: 'var(--info)',
-                        textDecoration: 'none',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        background: 'rgba(25, 130, 196, 0.1)',
-                        padding: '4px 10px',
-                        borderRadius: '6px'
-                      }}
-                    >
-                      🔗 Xtreino
-                    </a>
-                  </div>
-                )}
-
-                <div>
-                  {jogadoresOrdenados.map((j, idx) => (
-                    <div 
-                      className="player-row" 
-                      key={j.nome}
-                      style={idx === 0 ? { 
-                        background: 'rgba(255,215,0,0.08)', 
-                        borderLeft: '3px solid var(--gold)',
-                        borderRadius: '0 6px 6px 0'
-                      } : undefined}
-                    >
-                      <div className="player-name">
-                        <div className="player-avatar">
-                          {idx === 0 ? '⭐' : '👤'}
+                return (
+                  <tr key={time.nome}>
+                    <td><span className={`pos-badge ${posClass}`}>{index + 1}</span></td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div 
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 'bold',
+                            fontSize: '0.8rem',
+                            color: '#fff',
+                            background: `linear-gradient(135deg, ${config.cor}, ${config.cor}dd)`,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {avatar.iniciais}
                         </div>
-                        {j.nome}
-                        {idx === 0 && (
+                        <div>
+                          <strong>{time.nome}</strong>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--gray)' }}>
+                            {time.jogadores.length} jogadores | MVP: {topKill?.nome?.split(' ')[0] || '-'}
+                          </div>
+                          {config.xtreino && (
+                            <a 
+                              href={config.xtreino} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              style={{ fontSize: '0.7rem', color: 'var(--info)', textDecoration: 'none' }}
+                            >
+                              🔗 Xtreino
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td><strong>{time.q1_pos}º</strong> <span style={{ color: 'var(--gray)', fontSize: '0.8rem' }}>({time.q1_pp}pp)</span></td>
+                    <td><strong>{time.q2_pos}º</strong> <span style={{ color: 'var(--gray)', fontSize: '0.8rem' }}>({time.q2_pp}pp)</span></td>
+                    <td><strong>{time.q3_pos}º</strong> <span style={{ color: 'var(--gray)', fontSize: '0.8rem' }}>({time.q3_pp}pp)</span></td>
+                    <td><strong style={{ color: 'var(--gold)' }}>{time.total_pp}</strong></td>
+                    <td className="destaque-kill"><strong>{time.total_pk}</strong></td>
+                    <td>
+                      {time.strikes > 0 ? (
+                        <span style={{ color: 'var(--gold)', fontWeight: 'bold' }}>{time.strikes}x 🏆</span>
+                      ) : (
+                        <span style={{ color: 'var(--gray)' }}>-</span>
+                      )}
+                    </td>
+                    <td>{time.posicao_media}</td>
+                    <td><span className="destaque-total">{time.pt} pts</span></td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ===== TABELA 2: JOGADORES ===== */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '30px 0 12px', flexWrap: 'wrap', gap: '10px' }}>
+        <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1rem', color: 'var(--info)', margin: 0 }}>
+          ⚔️ Ranking de Jogadores
+        </h3>
+        
+        {/* Filtro por time */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label style={{ fontSize: '0.85rem', color: 'var(--gray)' }}>Filtrar por time:</label>
+          <select 
+            value={filtroTime} 
+            onChange={(e) => setFiltroTime(e.target.value)}
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border)',
+              color: 'var(--text)',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              fontSize: '0.85rem',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="todos">Todos os times</option>
+            {listaFinal.map(time => (
+              <option key={time.nome} value={time.nome}>{time.nome}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="table-responsive">
+        <table className="tabela-jogadores-grid">
+          <thead>
+            <tr>
+              <th style={{ width: '50px' }}>Pos</th>
+              <th>Jogador</th>
+              <th>Time</th>
+              <th>Q1 Kills</th>
+              <th>Q2 Kills</th>
+              <th>Q3 Kills</th>
+              <th style={{ color: 'var(--gold)' }}>Total Kills</th>
+              <th>Dano</th>
+              <th>MVP</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jogadoresFiltrados.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="td-empty">
+                  <div className="empty-state">
+                    <div className="icon">📭</div>
+                    <p>Nenhum jogador encontrado</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              jogadoresFiltrados.map((j, index) => {
+                const posClass = index === 0 ? 'pos-1' : index === 1 ? 'pos-2' : index === 2 ? 'pos-3' : 'pos-other';
+                const config = getTeamConfig(j.timeNome);
+                
+                return (
+                  <tr key={`${j.timeNome}-${j.nome}`}>
+                    <td><span className={`pos-badge ${posClass}`}>{index + 1}</span></td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '1.2rem' }}>
+                          {index === 0 ? '⭐' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤'}
+                        </span>
+                        <span style={{ fontWeight: index < 3 ? 'bold' : 'normal' }}>{j.nome}</span>
+                        {index === 0 && (
                           <span style={{ 
                             fontSize: '0.65rem', 
-                            marginLeft: '6px', 
                             color: 'var(--gold)', 
                             background: 'rgba(255,215,0,0.15)', 
                             padding: '2px 6px', 
                             borderRadius: '4px' 
                           }}>
-                            TOP KILL
+                            TOP FRAGGER
                           </span>
                         )}
                       </div>
-                      <div className="player-stats" style={{ fontSize: '0.8rem' }}>
-                        <span>⚔️ {j.total_kills} Kills</span>
-                        <span>💥 {j.dano || 'N/A'}</span>
-                        <span>🏅 {j.mvp > 0 ? '✅ MVP' : '-'}</span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div 
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '4px',
+                            background: config.cor,
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span style={{ fontSize: '0.85rem' }}>{j.timeNome}</span>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--gray)' }}>({j.timePosicao}º)</span>
                       </div>
-                      
-                      {/* Expanded player queda details */}
-                      {expandido && (
-                        <div style={{ 
-                          display: 'flex', 
-                          gap: '12px', 
-                          marginTop: '6px', 
-                          paddingLeft: '32px',
-                          fontSize: '0.7rem',
-                          color: 'var(--gray)'
-                        }}>
-                          <span>Q1: {j.q1_k || 0}k</span>
-                          <span>Q2: {j.q2_k || 0}k</span>
-                          <span>Q3: {j.q3_k || 0}k</span>
-                        </div>
+                    </td>
+                    <td>{j.q1_k || 0}</td>
+                    <td>{j.q2_k || 0}</td>
+                    <td>{j.q3_k || 0}</td>
+                    <td><strong style={{ color: 'var(--gold)', fontSize: '1.05rem' }}>{j.total_kills}</strong></td>
+                    <td style={{ color: 'var(--gray)', fontSize: '0.85rem' }}>{j.dano || 'N/A'}</td>
+                    <td>
+                      {j.mvp > 0 ? (
+                        <span style={{ color: 'var(--info)', fontWeight: 'bold' }}>✅ MVP</span>
+                      ) : (
+                        <span style={{ color: 'var(--gray)' }}>-</span>
                       )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })
-        )}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Resumo estatístico */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+        gap: '12px', 
+        marginTop: '24px',
+        padding: '16px',
+        background: 'rgba(255,255,255,0.03)',
+        borderRadius: '12px',
+        border: '1px solid var(--border)'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--gold)' }}>{timesFiltrados.length}</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--gray)' }}>Times</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--info)' }}>{jogadoresFiltrados.length}</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--gray)' }}>Jogadores</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--cor-accent)' }}>
+            {jogadoresFiltrados.reduce((sum, j) => sum + j.total_kills, 0)}
+          </div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--gray)' }}>Kills Totais</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--success)' }}>
+            {jogadoresFiltrados.length > 0 ? (jogadoresFiltrados.reduce((sum, j) => sum + j.total_kills, 0) / jogadoresFiltrados.length).toFixed(1) : 0}
+          </div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--gray)' }}>Kills/Jogador</div>
+        </div>
       </div>
     </>
   );
