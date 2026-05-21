@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo } from 'react';
+import { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { useCSVData } from '../hooks/useCSVData.js';
 import { TIMES_XTREINO, CONFIG_XTREINO } from '../data/timesFixos.js';
 
@@ -10,6 +10,44 @@ export function TorneioProvider({ children }) {
   const [mesSelecionado, setMesSelecionado] = useState('');
   const [diaSelecionado, setDiaSelecionado] = useState('');
   const [temaEscuro, setTemaEscuro] = useState(true);
+  
+  // Times fixos do XTreino
+  const [slots, setSlots] = useState(TIMES_XTREINO);
+  const config = CONFIG_XTREINO;
+
+  const meses = useMemo(() => {
+    return [...new Set(dados.map(item => item.Mes?.trim()).filter(Boolean))];
+  }, [dados]);
+
+  const dias = useMemo(() => {
+    if (!mesSelecionado) return [];
+    return [...new Set(
+      dados
+        .filter(item => item.Mes?.trim() === mesSelecionado)
+        .map(item => item.Dia?.trim())
+        .filter(Boolean)
+    )];
+  }, [dados, mesSelecionado]);
+
+  // AUTO-INICIALIZAR filtros quando dados carregam
+  useEffect(() => {
+    if (meses.length > 0 && !mesSelecionado) {
+      setMesSelecionado(meses[0]);
+    }
+  }, [meses, mesSelecionado]);
+
+  useEffect(() => {
+    if (dias.length > 0 && !diaSelecionado) {
+      setDiaSelecionado(dias[dias.length - 1]); // Último dia por padrão (mais recente)
+    }
+  }, [dias, diaSelecionado]);
+
+  // Resetar dia quando muda o mês
+  useEffect(() => {
+    if (mesSelecionado && dias.length > 0) {
+      setDiaSelecionado(dias[dias.length - 1]);
+    }
+  }, [mesSelecionado, dias]);
   
   // Times fixos do XTreino - vem do arquivo de config
   const [slots, setSlots] = useState(TIMES_XTREINO);
@@ -64,7 +102,6 @@ export function TorneioProvider({ children }) {
     dias,
     temaEscuro,
     setTemaEscuro,
-    // Novos: times fixos
     slots,
     setSlots,
     config,

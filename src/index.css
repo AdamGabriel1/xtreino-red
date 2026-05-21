@@ -2047,3 +2047,132 @@ tr:hover td {
     height: 28px;
   }
 }
+
+/* ===== FILTRO BAR DEVILS ===== */
+
+.filtro-bar-devils {
+  background: rgba(6, 9, 19, 0.4);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.6);
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  backdrop-filter: blur(12px);
+}
+
+.filtro-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.filtro-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.filtro-label i {
+  color: #f43f5e;
+  font-size: 1rem;
+}
+
+.filtro-selects {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.select-wrapper {
+  position: relative;
+  min-width: 140px;
+}
+
+.select-devils {
+  width: 100%;
+  background: #020617;
+  border: 1px solid #0f172a;
+  color: #fff;
+  padding: 10px 36px 10px 16px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 1px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: all 0.3s;
+  outline: none;
+}
+
+.select-devils:hover {
+  border-color: #1e293b;
+}
+
+.select-devils:focus {
+  border-color: #f43f5e;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+.select-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #475569;
+  font-size: 0.625rem;
+  pointer-events: none;
+}
+
+.data-selecionada-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(244, 63, 94, 0.1);
+  color: #fb7185;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid rgba(244, 63, 94, 0.2);
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.data-selecionada-badge i {
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .filtro-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtro-label {
+    justify-content: center;
+  }
+
+  .filtro-selects {
+    width: 100%;
+  }
+
+  .select-wrapper {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .data-selecionada-badge {
+    justify-content: center;
+    width: 100%;
+  }
+}

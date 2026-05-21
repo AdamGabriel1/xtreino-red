@@ -17,18 +17,6 @@ export default function App() {
   const { listaFinal, totalKillsGeral, totalJogadores, totalTimes } = usePontuacao(dados, mesSelecionado, diaSelecionado);
 
   useEffect(() => {
-    if (meses.length > 0 && !mesSelecionado) {
-      setMesSelecionado(meses[0]);
-    }
-  }, [meses, mesSelecionado, setMesSelecionado]);
-
-  useEffect(() => {
-    if (dias.length > 0) {
-      setDiaSelecionado(dias[0]);
-    }
-  }, [dias, setDiaSelecionado]);
-
-  useEffect(() => {
     const btn = document.getElementById('scrollTop');
     const handleScroll = () => {
       if (window.scrollY > 300) {

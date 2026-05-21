@@ -1,7 +1,16 @@
 import { useTorneio } from '../context/TorneioContext.jsx';
 
 export default function Header() {
-  const { config, temaEscuro, setTemaEscuro } = useTorneio();
+  const { 
+    temaEscuro, 
+    setTemaEscuro,
+    mesSelecionado,
+    setMesSelecionado,
+    diaSelecionado,
+    setDiaSelecionado,
+    meses,
+    dias
+  } = useTorneio();
 
   const toggleTheme = () => {
     setTemaEscuro(!temaEscuro);
@@ -29,6 +38,7 @@ export default function Header() {
       <button className="theme-toggle" onClick={toggleTheme} title="Alternar tema">
         {temaEscuro ? '🌙' : '☀️'}
       </button>
+      
       <header className="devils-header">
         <div className="header-content">
           <div className="logo-container">
@@ -46,22 +56,54 @@ export default function Header() {
           </div>
         </div>
       </header>
-      
-      {/* Tournament Info Bar */}
-      <div className="tournament-info-bar">
-        <div className="container info-bar-content">
-          <div className="info-tags">
-            <span className="tag tag-xtreino">
-              <i className="fa-solid fa-fire"></i> X-Treino Oficial
-            </span>
-            <span className="tag tag-date">
-              <i className="fa-solid fa-calendar-days"></i> {config.data}
-            </span>
-            <span className="tag tag-platform">
-              <i className="fa-solid fa-mobile-screen"></i> {config.plataforma}
-            </span>
-            <span className="tag tag-mode">
-              <i className="fa-solid fa-users"></i> {config.modo}
+
+      {/* Barra de Filtros - Mês e Dia */}
+      <div className="filtro-bar-devils">
+        <div className="container filtro-content">
+          <div className="filtro-label">
+            <i className="fa-solid fa-calendar-days"></i>
+            <span>Histórico do Campeonato:</span>
+          </div>
+
+          <div className="filtro-selects">
+            <div className="select-wrapper">
+              <select
+                id="select-mes"
+                value={mesSelecionado}
+                onChange={(e) => setMesSelecionado(e.target.value)}
+                className="select-devils"
+              >
+                {meses.length === 0 && <option value="">Carregando...</option>}
+                {meses.map(m => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+              <i className="fa-solid fa-chevron-down select-icon"></i>
+            </div>
+
+            <div className="select-wrapper">
+              <select
+                id="select-dia"
+                value={diaSelecionado}
+                onChange={(e) => setDiaSelecionado(e.target.value)}
+                className="select-devils"
+              >
+                {dias.length === 0 && <option value="">--</option>}
+                {dias.map(d => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+              <i className="fa-solid fa-chevron-down select-icon"></i>
+            </div>
+          </div>
+
+          {/* Info do dia selecionado */}
+          <div className="data-selecionada-badge">
+            <i className="fa-solid fa-clock"></i>
+            <span>
+              {diaSelecionado && mesSelecionado 
+                ? `${diaSelecionado} de ${mesSelecionado}` 
+                : 'Selecione uma data'}
             </span>
           </div>
         </div>
