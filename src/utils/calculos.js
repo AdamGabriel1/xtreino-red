@@ -1,4 +1,4 @@
-// Tabela de pontuação DEVILS MOBILE LEAGUE
+// Tabela de pontuação por posição (PP) do Battle Royale
 const TABELA_PONTOS_DEVILS = { 
   1: 12, 2: 10, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1 
 };
@@ -7,7 +7,38 @@ export function calcularPontosPosicao(posicao) {
   return TABELA_PONTOS_DEVILS[posicao] || 0;
 }
 
-// ... (mantenha as funções existentes: ordenarTimes, encontrarMelhorTime, etc.)
+export function ordenarTimes(lista) {
+  return [...lista].sort((a, b) => b.pt - a.pt || b.total_pk - a.total_pk);
+}
+
+export function encontrarMelhorTime(lista) {
+  if (!lista.length) return null;
+  return lista[0];
+}
+
+export function encontrarTopFragger(lista) {
+  let top = { nome: '', kills: 0, time: '' };
+  lista.forEach(time => {
+    time.jogadores.forEach(j => {
+      if (j.total_kills > top.kills) {
+        top = { nome: j.nome, kills: j.total_kills, time: time.nome };
+      }
+    });
+  });
+  return top;
+}
+
+export function encontrarTopMVP(lista) {
+  let top = { nome: '', mvps: 0, time: '' };
+  lista.forEach(time => {
+    time.jogadores.forEach(j => {
+      if (j.mvp > top.mvps) {
+        top = { nome: j.nome, mvps: j.mvp, time: time.nome };
+      }
+    });
+  });
+  return top;
+}
 
 export function processarDadosDoDia(dadosDoDia) {
   let resumoTimes = {};
