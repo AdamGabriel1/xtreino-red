@@ -7,7 +7,7 @@ export function useCSVData() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    Papa.parse('/data/campeonato.csv', {
+    Papa.parse('../data/campeonato.csv', {
       download: true,
       header: true,
       skipEmptyLines: true,
