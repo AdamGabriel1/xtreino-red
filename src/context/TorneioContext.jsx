@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useMemo } from 'react';
 import { useCSVData } from '../hooks/useCSVData.js';
+import { TIMES_XTREINO, CONFIG_XTREINO } from '../data/timesFixos.js';
 
 const TorneioContext = createContext(null);
 
@@ -9,6 +10,10 @@ export function TorneioProvider({ children }) {
   const [mesSelecionado, setMesSelecionado] = useState('');
   const [diaSelecionado, setDiaSelecionado] = useState('');
   const [temaEscuro, setTemaEscuro] = useState(true);
+  
+  // Times fixos do XTreino - vem do arquivo de config
+  const [slots, setSlots] = useState(TIMES_XTREINO);
+  const config = CONFIG_XTREINO;
 
   const meses = useMemo(() => {
     return [...new Set(dados.map(item => item.Mes?.trim()).filter(Boolean))];
@@ -24,6 +29,27 @@ export function TorneioProvider({ children }) {
     )];
   }, [dados, mesSelecionado]);
 
+  // Helpers para manipular slots
+  const atualizarSlot = (id, nome) => {
+    setSlots(prev => prev.map(s => 
+      s.id === id ? { ...s, nome: nome.trim(), status: nome.trim() ? 'confirmado' : 'vazio' } : s
+    ));
+  };
+
+  const adicionarTime = (nome) => {
+    const slotVazio = slots.find(s => s.status === 'vazio');
+    if (!slotVazio) return false;
+    atualizarSlot(slotVazio.id, nome);
+    return true;
+  };
+
+  const removerTime = (id) => {
+    atualizarSlot(id, '');
+  };
+
+  const slotsPreenchidos = slots.filter(s => s.status === 'confirmado').length;
+  const progressoPercentual = (slotsPreenchidos / config.maxSlots) * 100;
+
   const value = {
     dados,
     loading,
@@ -38,6 +64,15 @@ export function TorneioProvider({ children }) {
     dias,
     temaEscuro,
     setTemaEscuro,
+    // Novos: times fixos
+    slots,
+    setSlots,
+    config,
+    atualizarSlot,
+    adicionarTime,
+    removerTime,
+    slotsPreenchidos,
+    progressoPercentual,
   };
 
   return (

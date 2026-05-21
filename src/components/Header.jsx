@@ -29,13 +29,15 @@ export default function Header() {
       <button className="theme-toggle" onClick={toggleTheme} title="Alternar tema">
         {temaEscuro ? '🌙' : '☀️'}
       </button>
-      <header>
+      <header className="devils-header">
         <div className="header-content">
           <div className="logo-container">
-            <div className="logo-icon">⚔️</div>
+            <div className="logo-icon devils-logo">
+              <i className="fa-solid fa-gamepad"></i>
+            </div>
             <div>
-              <h1>XTREINO BLOOD STRIKE</h1>
-              <p>Painel de Controle e Estatísticas Interativas</p>
+              <h1>DEVILS MOBILE</h1>
+              <span className="league-badge">LEAGUE</span>
             </div>
           </div>
           <div className="live-indicator">
@@ -44,6 +46,26 @@ export default function Header() {
           </div>
         </div>
       </header>
+      
+      {/* Tournament Info Bar */}
+      <div className="tournament-info-bar">
+        <div className="container info-bar-content">
+          <div className="info-tags">
+            <span className="tag tag-xtreino">
+              <i className="fa-solid fa-fire"></i> X-Treino Oficial
+            </span>
+            <span className="tag tag-date">
+              <i className="fa-solid fa-calendar-days"></i> {config.data}
+            </span>
+            <span className="tag tag-platform">
+              <i className="fa-solid fa-mobile-screen"></i> {config.plataforma}
+            </span>
+            <span className="tag tag-mode">
+              <i className="fa-solid fa-users"></i> {config.modo}
+            </span>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

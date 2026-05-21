@@ -6,6 +6,7 @@ const TABS = [
   { id: 'tabela', icon: '📊', label: 'Tabela do Dia' },
   { id: 'times', icon: '👥', label: 'Times & Elencos' },
   { id: 'estatisticas', icon: '📈', label: 'Estatísticas' },
+  { id: 'inscricao', icon: '➕', label: 'Inscrição' }, // NOVA ABA
 ];
 
 export default function NavTabs() {
