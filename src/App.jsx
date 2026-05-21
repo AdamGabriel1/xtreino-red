@@ -5,17 +5,17 @@ import { encontrarMelhorTime, encontrarTopFragger, encontrarTopMVP } from './uti
 import Header from './components/Header.jsx';
 import NavTabs from './components/NavTabs.jsx';
 import QuickStats from './components/QuickStats.jsx';
-import TabelaPontos from './components/TabelaPontos.jsx';
+import TabelaDevils from './components/TabelaDevils.jsx';
 import TimesGrid from './components/TimesGrid.jsx';
 import MiniLeaderboard from './components/MiniLeaderboard.jsx';
-import HomeDevils from './components/HomeDevils.jsx'; // NOVO COMPONENTE
-import InscricaoPage from './components/InscricaoPage.jsx'; // NOVO COMPONENTE
-import TabelaDevils from './components/TabelaDevils.jsx';
+import HomeDevils from './components/HomeDevils.jsx';
+import InscricaoPage from './components/InscricaoPage.jsx';
 
 export default function App() {
-  const { abaAtiva, dados, mesSelecionado, diaSelecionado, setMesSelecionado, setDiaSelecionado, meses, dias, loading, error, slots, config } = useTorneio();
+  const { abaAtiva, dados, mesSelecionado, diaSelecionado, loading, error, slots, config } = useTorneio();
   const { listaFinal, totalKillsGeral, totalJogadores, totalTimes } = usePontuacao(dados, mesSelecionado, diaSelecionado);
 
+  // Scroll to top button
   useEffect(() => {
     const btn = document.getElementById('scrollTop');
     const handleScroll = () => {
@@ -44,7 +44,7 @@ export default function App() {
       <NavTabs />
 
       <div className="container">
-        {/* ABA INÍCIO - DEVILS MOBILE LEAGUE */}
+        {/* ABA INÍCIO */}
         <div id="home" className={`tab-content ${abaAtiva === 'home' ? 'active' : ''}`}>
           <HomeDevils />
         </div>
@@ -61,13 +61,11 @@ export default function App() {
 
         {/* ABA ESTATÍSTICAS */}
         <div id="estatisticas" className={`tab-content ${abaAtiva === 'estatisticas' ? 'active' : ''}`}>
-          {/* ... mantenha o conteúdo de estatísticas que já tinha ... */}
           <div className="section-title">
             <span>📈</span> Estatísticas Gerais
             <span className="line"></span>
           </div>
           <div className="grid-home">
-            {/* ... cards de melhor time, top fragger, etc ... */}
             <div className="card">
               <h3><span className="icon">🏆</span>Melhor Time do Dia</h3>
               <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -151,7 +149,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* ABA INSCRIÇÃO - NOVA */}
+        {/* ABA INSCRIÇÃO */}
         <div id="inscricao" className={`tab-content ${abaAtiva === 'inscricao' ? 'active' : ''}`}>
           <InscricaoPage />
         </div>

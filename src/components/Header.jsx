@@ -9,7 +9,10 @@ export default function Header() {
     diaSelecionado,
     setDiaSelecionado,
     meses,
-    dias
+    dias,
+    loading,
+    error,
+    dados
   } = useTorneio();
 
   const toggleTheme = () => {
@@ -32,6 +35,12 @@ export default function Header() {
       document.body.style.backgroundColor = '#f0f2f5';
     }
   };
+
+  // Debug info
+  console.log('🎨 Header render - loading:', loading, 'error:', error?.message, 'meses:', meses, 'dados.length:', dados.length);
+
+  const mesesDisponiveis = meses.length > 0;
+  const diasDisponiveis = dias.length > 0;
 
   return (
     <>
@@ -57,7 +66,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Barra de Filtros - Mês e Dia */}
       <div className="filtro-bar-devils">
         <div className="container filtro-content">
           <div className="filtro-label">
@@ -66,30 +74,45 @@ export default function Header() {
           </div>
 
           <div className="filtro-selects">
+            {/* Select Mês */}
             <div className="select-wrapper">
               <select
                 id="select-mes"
                 value={mesSelecionado}
-                onChange={(e) => setMesSelecionado(e.target.value)}
+                onChange={(e) => {
+                  console.log('📅 Mês selecionado:', e.target.value);
+                  setMesSelecionado(e.target.value);
+                }}
                 className="select-devils"
+                disabled={loading}
               >
-                {meses.length === 0 && <option value="">Carregando...</option>}
-                {meses.map(m => (
+                {loading && <option value="">Carregando...</option>}
+                {!loading && !mesesDisponiveis && (
+                  <option value="">{error ? `Erro: ${error.message}` : 'Sem dados'}</option>
+                )}
+                {!loading && mesesDisponiveis && meses.map(m => (
                   <option key={m} value={m}>{m}</option>
                 ))}
               </select>
               <i className="fa-solid fa-chevron-down select-icon"></i>
             </div>
 
+            {/* Select Dia */}
             <div className="select-wrapper">
               <select
                 id="select-dia"
                 value={diaSelecionado}
-                onChange={(e) => setDiaSelecionado(e.target.value)}
+                onChange={(e) => {
+                  console.log('📅 Dia selecionado:', e.target.value);
+                  setDiaSelecionado(e.target.value);
+                }}
                 className="select-devils"
+                disabled={loading || !mesSelecionado}
               >
-                {dias.length === 0 && <option value="">--</option>}
-                {dias.map(d => (
+                {loading && <option value="">...</option>}
+                {!loading && !mesSelecionado && <option value="">Escolha mês</option>}
+                {!loading && mesSelecionado && !diasDisponiveis && <option value="">Sem dias</option>}
+                {!loading && diasDisponiveis && dias.map(d => (
                   <option key={d} value={d}>{d}</option>
                 ))}
               </select>
@@ -97,13 +120,13 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Info do dia selecionado */}
-          <div className="data-selecionada-badge">
+          {/* Badge */}
+          <div className={`data-selecionada-badge ${!diaSelecionado ? 'badge-disabled' : ''}`}>
             <i className="fa-solid fa-clock"></i>
             <span>
               {diaSelecionado && mesSelecionado 
                 ? `${diaSelecionado} de ${mesSelecionado}` 
-                : 'Selecione uma data'}
+                : loading ? 'Carregando...' : 'Selecione'}
             </span>
           </div>
         </div>
