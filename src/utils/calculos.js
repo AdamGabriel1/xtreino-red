@@ -1,4 +1,4 @@
-// Tabela de pontuação por posição (PP) do Battle Royale
+// Tabela de pontuação DEVILS MOBILE LEAGUE
 const TABELA_PONTOS_DEVILS = { 
   1: 12, 2: 10, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1 
 };
@@ -28,14 +28,13 @@ export function encontrarTopFragger(lista) {
   return top;
 }
 
+// MVP = top kill de cada time (calculado no processamento)
 export function encontrarTopMVP(lista) {
-  let top = { nome: '', mvps: 0, time: '' };
+  let top = { nome: '', kills: 0, time: '' };
   lista.forEach(time => {
-    time.jogadores.forEach(j => {
-      if (j.mvp > top.mvps) {
-        top = { nome: j.nome, mvps: j.mvp, time: time.nome };
-      }
-    });
+    if (time.mvp && time.mvp.nome && time.mvp.kills > top.kills) {
+      top = { nome: time.mvp.nome, kills: time.mvp.kills, time: time.nome };
+    }
   });
   return top;
 }
@@ -53,8 +52,7 @@ export function processarDadosDoDia(dadosDoDia) {
     const q2_k = parseInt(linha.Q2_Kills) || 0;
     const q3_pos = parseInt(linha.Q3_Pos) || 0;
     const q3_k = parseInt(linha.Q3_Kills) || 0;
-    const mvp = parseInt(linha.MVP_Vezes) || 0;
-    const dano = parseFloat(linha.Dano_Medio) || 0;
+    const dano = linha.Dano_Medio || "Sem Informações";
 
     if (!resumoTimes[time]) {
       resumoTimes[time] = {
@@ -67,43 +65,57 @@ export function processarDadosDoDia(dadosDoDia) {
         q3_pos: q3_pos,
         total_pk: 0,
         jogadores: [],
-        mvps_time: 0,
-        dano_total: 0
+        mvps_time: 0
       };
     }
 
     const killsJogador = q1_k + q2_k + q3_k;
     resumoTimes[time].total_pk += killsJogador;
-    resumoTimes[time].mvps_time += mvp;
-    resumoTimes[time].dano_total += dano;
     totalKillsGeral += killsJogador;
     totalJogadores++;
 
     resumoTimes[time].jogadores.push({
       nome: linha.Jogador || 'Desconhecido',
       total_kills: killsJogador,
-      dano: dano.toFixed(0),
-      mvp: mvp,
-      q1_pos: q1_pos,
-      q2_pos: q2_pos,
-      q3_pos: q3_pos,
+      dano: dano,
+      mvp: 0, // será calculado depois
       q1_k: q1_k,
       q2_k: q2_k,
       q3_k: q3_k
     });
   });
 
+  // Calcular MVP de cada time = jogador com mais kills
+  Object.values(resumoTimes).forEach(time => {
+    let topKills = -1;
+    let mvpJogador = null;
+    
+    time.jogadores.forEach(j => {
+      if (j.total_kills > topKills) {
+        topKills = j.total_kills;
+        mvpJogador = j;
+      }
+    });
+    
+    // Marcar o MVP no time e no jogador
+    if (mvpJogador) {
+      mvpJogador.mvp = 1;
+      time.mvp = { nome: mvpJogador.nome, kills: mvpJogador.total_kills };
+      time.mvps_time = 1;
+    }
+  });
+
   let listaFinal = Object.values(resumoTimes).map(time => {
     const total_pp = time.q1_pp + time.q2_pp + time.q3_pp;
     const pt = total_pp + time.total_pk;
     
-    // Calcular booyahs (vitórias)
+    // Booyahs (vitórias)
     let strikes = 0;
     if (time.q1_pos === 1) strikes++;
     if (time.q2_pos === 1) strikes++;
     if (time.q3_pos === 1) strikes++;
     
-    // Calcular posição média
+    // Posição média
     const posicoesValidas = [time.q1_pos, time.q2_pos, time.q3_pos].filter(p => p > 0);
     const posicao_media = posicoesValidas.length > 0 
       ? (posicoesValidas.reduce((a, b) => a + b, 0) / posicoesValidas.length).toFixed(1)

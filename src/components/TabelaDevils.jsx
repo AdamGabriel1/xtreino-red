@@ -10,18 +10,11 @@ const TABS = [
   { id: 'q3', label: '3ª Ilha', icon: 'fa-3' },
 ];
 
-const MEDAL_CLASSES = {
-  0: 'medal-gold',
-  1: 'medal-silver', 
-  2: 'medal-bronze'
-};
-
 export default function TabelaDevils() {
   const { dados, mesSelecionado, diaSelecionado } = useTorneio();
   const { listaFinal } = usePontuacao(dados, mesSelecionado, diaSelecionado);
   const [abaAtiva, setAbaAtiva] = useState('geral');
 
-  // Ordenar conforme a aba
   const equipesOrdenadas = [...listaFinal].sort((a, b) => {
     if (abaAtiva === 'geral') {
       return b.pt - a.pt || b.total_pk - a.total_pk;
@@ -35,7 +28,6 @@ export default function TabelaDevils() {
 
   return (
     <div className="animate-fade-in">
-      {/* Header */}
       <div className="tabela-header-devils">
         <div>
           <h2 className="tabela-title-devils">
@@ -53,7 +45,6 @@ export default function TabelaDevils() {
         </div>
       </div>
 
-      {/* Sub-abas */}
       <div className="tab-bar-devils">
         {TABS.map(tab => (
           <button
@@ -66,7 +57,6 @@ export default function TabelaDevils() {
         ))}
       </div>
 
-      {/* Tabela */}
       <div className="tabela-container-devils">
         <div className="table-responsive">
           <table className="tabela-devils">
@@ -79,6 +69,8 @@ export default function TabelaDevils() {
                     <th className="th-queda col-queda">Q1 (PP/PK)</th>
                     <th className="th-queda col-queda">Q2 (PP/PK)</th>
                     <th className="th-queda col-queda">Q3 (PP/PK)</th>
+                    <th className="th-total">Total PP</th>
+                    <th className="th-total">Total PK</th>
                   </>
                 )}
                 {!isGeral && (
@@ -87,8 +79,6 @@ export default function TabelaDevils() {
                     <th className="th-queda">Kills</th>
                   </>
                 )}
-                {isGeral && <th className="th-total">Total PP</th>}
-                {isGeral && <th className="th-total">Total PK</th>}
                 <th className="th-pt">PT (Total)</th>
               </tr>
             </thead>
@@ -121,34 +111,18 @@ export default function TabelaDevils() {
   );
 }
 
-function TabelaRow({ equipe, index, modo, isGeral }) {
+function TabelaRow({ equipe, index, isGeral }) {
   const config = getTeamConfig(equipe.nome);
   const avatar = gerarAvatarTime(equipe.nome, config.cor);
   
-  // Medalha para top 3
   let posBadge = `${index + 1}º`;
-  if (index < 3) {
-    const medalClass = MEDAL_CLASSES[index];
-    posBadge = (
-      <span className={`medal-devils ${medalClass}`}>
-        {index + 1}º
-      </span>
-    );
+  if (index === 0) {
+    posBadge = <span className="medal-devils medal-gold">1º</span>;
+  } else if (index === 1) {
+    posBadge = <span className="medal-devils medal-silver">2º</span>;
+  } else if (index === 2) {
+    posBadge = <span className="medal-devils medal-bronze">3º</span>;
   }
-
-  // Renderizar logo ou avatar
-  const logoHtml = config.logo ? (
-    <img 
-      src={config.logo} 
-      alt={equipe.nome} 
-      className="team-logo-tabela"
-      style={{ borderColor: `${config.cor}40` }}
-      onError={(e) => {
-        e.target.style.display = 'none';
-        e.target.nextSibling.style.display = 'flex';
-      }}
-    />
-  ) : null;
 
   return (
     <tr className="tr-devils">
@@ -156,7 +130,6 @@ function TabelaRow({ equipe, index, modo, isGeral }) {
       
       <td className="td-equipe">
         <div className="equipe-cell">
-          {logoHtml}
           <div 
             className="avatar-fallback-tabela"
             style={avatar.style}
@@ -201,14 +174,12 @@ function TabelaRow({ equipe, index, modo, isGeral }) {
         </>
       ) : (
         <>
-          <td className="td-queda">{equipe[`${modo}_pp`]} PP</td>
-          <td className="td-queda pk-value">{equipe[`${modo}_kills`]} Kills</td>
+          <td className="td-queda">{equipe[`${isGeral ? 'q1' : 'q1'}_pp`]} PP</td>
+          <td className="td-queda pk-value">{equipe[`${isGeral ? 'q1' : 'q1'}_kills`]} Kills</td>
         </>
       )}
 
-      <td className="td-pt">
-        {isGeral ? equipe.pt : equipe[`${modo}_pp`] + equipe[`${modo}_kills`]} pts
-      </td>
+      <td className="td-pt">{equipe.pt}</td>
     </tr>
   );
 }

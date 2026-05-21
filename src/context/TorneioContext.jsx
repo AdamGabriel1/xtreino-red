@@ -14,82 +14,53 @@ export function TorneioProvider({ children }) {
   const [slots, setSlots] = useState(TIMES_XTREINO);
   const config = CONFIG_XTREINO;
 
-  // Meses únicos dos dados
+  // Extrair meses únicos dos dados
   const meses = useMemo(() => {
     const lista = [...new Set(dados.map(item => item.Mes?.trim()).filter(Boolean))];
-    const sorted = lista.sort();
-    console.log('📅 Meses calculados:', sorted);
-    return sorted;
+    console.log('Meses encontrados:', lista);
+    return lista.sort();
   }, [dados]);
 
-  // Dias do mês selecionado
+  // Extrair dias do mês selecionado
   const dias = useMemo(() => {
-    if (!mesSelecionado) {
-      console.log('📅 Sem mês selecionado, dias vazio');
-      return [];
-    }
-    const filtrados = dados.filter(item => item.Mes?.trim() === mesSelecionado);
-    const lista = [...new Set(filtrados.map(item => item.Dia?.trim()).filter(Boolean))];
-    const sorted = lista.sort((a, b) => {
+    if (!mesSelecionado) return [];
+    const lista = [...new Set(
+      dados
+        .filter(item => item.Mes?.trim() === mesSelecionado)
+        .map(item => item.Dia?.trim())
+        .filter(Boolean)
+    )];
+    console.log('Dias para', mesSelecionado, ':', lista);
+    return lista.sort((a, b) => {
       const numA = parseInt(a.replace(/\D/g, '')) || 0;
       const numB = parseInt(b.replace(/\D/g, '')) || 0;
       return numA - numB;
     });
-    console.log(`📅 Dias para ${mesSelecionado}:`, sorted);
-    return sorted;
   }, [dados, mesSelecionado]);
 
-  // INICIALIZAR quando dados carregam
+  // Inicializar mês quando dados carregam
   useEffect(() => {
-    console.log('🔄 Effect inicializar - loading:', loading, 'meses:', meses, 'mesSelecionado:', mesSelecionado);
+    if (loading) return;
+    if (meses.length === 0) return;
     
-    if (loading) {
-      console.log('⏳ Ainda carregando...');
-      return;
+    console.log('Inicializando mês. Atual:', mesSelecionado, 'Disponíveis:', meses);
+    
+    if (!mesSelecionado || !meses.includes(mesSelecionado)) {
+      setMesSelecionado(meses[0]);
     }
-    
-    if (meses.length === 0) {
-      console.log('⚠️ Sem meses disponíveis');
-      return;
-    }
-    
-    // Se não tem mês selecionado, seleciona o primeiro
-    if (!mesSelecionado) {
-      const primeiro = meses[0];
-      console.log('✅ Selecionando primeiro mês:', primeiro);
-      setMesSelecionado(primeiro);
-      return;
-    }
-    
-    // Se mês selecionado não existe na lista, corrige
-    if (!meses.includes(mesSelecionado)) {
-      const primeiro = meses[0];
-      console.log('🔄 Mês inválido, corrigindo para:', primeiro);
-      setMesSelecionado(primeiro);
-      return;
-    }
-    
-    // Mês válido, verificar dia
-    if (dias.length > 0 && (!diaSelecionado || !dias.includes(diaSelecionado))) {
-      const ultimo = dias[dias.length - 1];
-      console.log('✅ Selecionando último dia:', ultimo);
-      setDiaSelecionado(ultimo);
-    }
-    
-  }, [loading, meses, mesSelecionado, dias, diaSelecionado]);
+  }, [loading, meses]);
 
-  // Resetar dia quando muda mês manualmente
+  // Inicializar dia quando mês ou dias mudam
   useEffect(() => {
     if (!mesSelecionado || dias.length === 0) return;
     
+    console.log('Inicializando dia. Atual:', diaSelecionado, 'Disponíveis:', dias);
+    
     if (!diaSelecionado || !dias.includes(diaSelecionado)) {
-      const ultimo = dias[dias.length - 1];
-      console.log('🔄 Mês mudou, novo dia:', ultimo);
-      setDiaSelecionado(ultimo);
+      setDiaSelecionado(dias[dias.length - 1]);
     }
-  }, [mesSelecionado, dias, diaSelecionado]);
+  }, [mesSelecionado, dias]);
 
-  // Helpers slots
   const atualizarSlot = (id, nome) => {
     setSlots(prev => prev.map(s => 
       s.id === id ? { ...s, nome: nome.trim(), status: nome.trim() ? 'confirmado' : 'vazio' } : s
