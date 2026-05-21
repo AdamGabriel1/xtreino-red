@@ -111,10 +111,10 @@ export default function TabelaDevils() {
   );
 }
 
-function TabelaRow({ equipe, index, isGeral }) {
+function TabelaRow({ equipe, index, modo, isGeral }) {
   const config = getTeamConfig(equipe.nome);
   const avatar = gerarAvatarTime(equipe.nome, config.cor);
-  
+
   let posBadge = `${index + 1}º`;
   if (index === 0) {
     posBadge = <span className="medal-devils medal-gold">1º</span>;
@@ -127,7 +127,7 @@ function TabelaRow({ equipe, index, isGeral }) {
   return (
     <tr className="tr-devils">
       <td className="td-pos">{posBadge}</td>
-      
+
       <td className="td-equipe">
         <div className="equipe-cell">
           <div 
@@ -174,8 +174,8 @@ function TabelaRow({ equipe, index, isGeral }) {
         </>
       ) : (
         <>
-          <td className="td-queda">{equipe[`${isGeral ? 'q1' : 'q1'}_pp`]} PP</td>
-          <td className="td-queda pk-value">{equipe[`${isGeral ? 'q1' : 'q1'}_kills`]} Kills</td>
+          <td className="td-queda">{equipe[`${modo}_pp`]} PP</td>
+          <td className="td-queda pk-value">{equipe[`${modo}_kills`]} Kills</td>
         </>
       )}
 
