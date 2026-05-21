@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTorneio } from '../context/TorneioContext.jsx';
 import { usePontuacao } from '../hooks/usePontuacao.js';
+import { getTeamConfig, gerarAvatarTime } from '../data/teamConfig.js';
 
 export default function TimesGrid() {
   const { dados, mesSelecionado, diaSelecionado } = useTorneio();
@@ -40,10 +41,24 @@ export default function TimesGrid() {
           timesFiltrados.map((time, index) => {
             const posicao = index + 1;
             const posBadge = posicao <= 3 ? ['🥇', '🥈', '🥉'][posicao - 1] : `#${posicao}`;
+            const config = getTeamConfig(time.nome);
+            const avatar = gerarAvatarTime(time.nome, config.cor);
+
+            // Ordenar jogadores por kills (destacar top kill)
+            const jogadoresOrdenados = [...time.jogadores].sort((a, b) => b.total_kills - a.total_kills);
+            const mvpDoTime = jogadoresOrdenados[0];
+
             return (
               <div className="card" key={time.nome} data-team-name={time.nome.toLowerCase()}>
                 <div className="team-card-header">
-                  <div className="team-logo">{time.nome.substring(0, 2).toUpperCase()}</div>
+                  <div 
+                    className="team-logo"
+                    style={{
+                      background: `linear-gradient(135deg, ${config.cor}, ${config.cor}dd)`,
+                    }}
+                  >
+                    {avatar.iniciais}
+                  </div>
                   <div className="team-info">
                     <h4>{time.nome} <span style={{ fontSize: '0.9rem' }}>{posBadge}</span></h4>
                     <div className="team-meta">
@@ -57,11 +72,18 @@ export default function TimesGrid() {
                   <span style={{ color: 'var(--cor-accent)' }}><strong>MVP:</strong> {time.mvps_time}</span>
                 </div>
                 <div>
-                  {time.jogadores.map(j => (
-                    <div className="player-row" key={j.nome}>
+                  {jogadoresOrdenados.map((j, idx) => (
+                    <div 
+                      className="player-row" 
+                      key={j.nome}
+                      style={idx === 0 ? { background: 'rgba(255,215,0,0.08)', borderLeft: '3px solid var(--gold)' } : undefined}
+                    >
                       <div className="player-name">
-                        <div className="player-avatar">👤</div>
+                        <div className="player-avatar">
+                          {idx === 0 ? '⭐' : '👤'}
+                        </div>
                         {j.nome}
+                        {idx === 0 && <span style={{ fontSize: '0.7rem', marginLeft: '6px', color: 'var(--gold)' }}>TOP KILL</span>}
                       </div>
                       <div className="player-stats">
                         <span>⚔️ {j.total_kills} Kills</span>
