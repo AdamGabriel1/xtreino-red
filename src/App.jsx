@@ -10,7 +10,7 @@ import TimesGrid from './components/TimesGrid';
 import MiniLeaderboard from './components/MiniLeaderboard';
 
 export default function App() {
-  const { abaAtiva, dados, mesSelecionado, setMesSelecionado, setDiaSelecionado, meses, dias, loading, error } = useTorneio();
+  const { abaAtiva, dados, mesSelecionado, diaSelecionado, setMesSelecionado, setDiaSelecionado, meses, dias, loading, error } = useTorneio();
   const { listaFinal, totalKillsGeral, totalJogadores, totalTimes } = usePontuacao(dados, mesSelecionado, diaSelecionado);
 
   // Inicializa filtros quando dados carregam
