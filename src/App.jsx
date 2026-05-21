@@ -10,6 +10,7 @@ import TimesGrid from './components/TimesGrid.jsx';
 import MiniLeaderboard from './components/MiniLeaderboard.jsx';
 import HomeDevils from './components/HomeDevils.jsx'; // NOVO COMPONENTE
 import InscricaoPage from './components/InscricaoPage.jsx'; // NOVO COMPONENTE
+import TabelaDevils from './components/TabelaDevils.jsx';
 
 export default function App() {
   const { abaAtiva, dados, mesSelecionado, diaSelecionado, setMesSelecionado, setDiaSelecionado, meses, dias, loading, error, slots, config } = useTorneio();
@@ -62,7 +63,7 @@ export default function App() {
 
         {/* ABA TABELA */}
         <div id="tabela" className={`tab-content ${abaAtiva === 'tabela' ? 'active' : ''}`}>
-          <TabelaPontos />
+          <TabelaDevils />
         </div>
 
         {/* ABA TIMES */}

@@ -1695,3 +1695,355 @@ tr:hover td {
   font-size: 1.25rem;
   margin-bottom: 2px;
 }
+
+/* ===== TABELA DEVILS MOBILE LEAGUE ===== */
+
+.tabela-header-devils {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .tabela-header-devils {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.tabela-title-devils {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff;
+  border-left: 4px solid #f43f5e;
+  padding-left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.tabela-title-devils i {
+  color: #f43f5e;
+}
+
+.tabela-subtitle-devils {
+  color: #64748b;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  margin-left: 16px;
+}
+
+.tabela-count-devils {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #020617;
+  border: 1px solid #0f172a;
+  border-radius: 12px;
+  padding: 8px 16px;
+}
+
+/* Tab Bar */
+.tab-bar-devils {
+  display: flex;
+  border-bottom: 1px solid #0f172a;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 1px;
+}
+
+.tab-btn-devils {
+  padding: 12px 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #64748b;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.tab-btn-devils:hover {
+  color: #fff;
+}
+
+.tab-btn-devils.active {
+  color: #f43f5e;
+  border-bottom-color: #f43f5e;
+  background: linear-gradient(to top, rgba(244,63,94,0.05), transparent);
+}
+
+/* Tabela Container */
+.tabela-container-devils {
+  background: #020617;
+  border: 1px solid #0f172a;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Tabela */
+.tabela-devils {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 700px;
+}
+
+.tabela-devils thead {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.tabela-devils th {
+  padding: 16px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #64748b;
+  border-bottom: 1px solid #0f172a;
+  white-space: nowrap;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.th-pos {
+  text-align: center;
+  width: 64px;
+}
+
+.th-equipe {
+  padding-left: 24px;
+}
+
+.th-queda {
+  text-align: center;
+}
+
+.th-total {
+  text-align: center;
+}
+
+.th-pt {
+  text-align: center;
+  background: rgba(244, 63, 94, 0.05);
+  color: #fb7185;
+  border-left: 1px solid #0f172a;
+  font-weight: 900;
+}
+
+/* Body */
+.tr-devils {
+  transition: background 0.2s;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.4);
+}
+
+.tr-devils:hover {
+  background: rgba(244, 63, 94, 0.03);
+}
+
+.td-pos {
+  padding: 16px;
+  text-align: center;
+  font-weight: 700;
+  color: #475569;
+}
+
+.td-equipe {
+  padding: 16px 24px;
+}
+
+.equipe-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-logo-tabela {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid;
+  display: none; /* Só aparece se carregar */
+}
+
+.avatar-fallback-tabela {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.75rem;
+  color: #fff;
+  border: 2px solid;
+  flex-shrink: 0;
+}
+
+.equipe-nome {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.875rem;
+}
+
+.xtreino-link-tabela {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #34d399;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  margin-top: 2px;
+  transition: color 0.2s;
+}
+
+.xtreino-link-tabela:hover {
+  color: #6ee7b7;
+}
+
+/* Medalhas */
+.medal-devils {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.medal-gold {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #0f172a;
+}
+
+.medal-silver {
+  background: linear-gradient(135deg, #e5e7eb, #9ca3af);
+  color: #0f172a;
+}
+
+.medal-bronze {
+  background: linear-gradient(135deg, #b45309, #92400e);
+  color: #fff;
+}
+
+/* Queda cells */
+.td-queda {
+  padding: 16px;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.pp-value {
+  font-weight: 600;
+  color: #fff;
+}
+
+.pk-value {
+  color: #f43f5e;
+  font-weight: 600;
+}
+
+.sep {
+  color: #334155;
+  margin: 0 2px;
+}
+
+/* Total cells */
+.td-total {
+  padding: 16px;
+  text-align: center;
+  font-weight: 700;
+  color: #cbd5e1;
+  font-size: 0.875rem;
+}
+
+.pk-total {
+  color: #f43f5e;
+}
+
+/* PT cell */
+.td-pt {
+  padding: 16px 24px;
+  text-align: center;
+  background: rgba(244, 63, 94, 0.03);
+  border-left: 1px solid #0f172a;
+  font-size: 1.125rem;
+  font-weight: 900;
+  color: #f43f5e;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* Empty state */
+.td-empty {
+  padding: 48px;
+  text-align: center;
+}
+
+.empty-state-devils {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #475569;
+}
+
+.empty-state-devils i {
+  font-size: 2rem;
+  color: #334155;
+}
+
+.empty-state-devils p {
+  font-size: 0.875rem;
+}
+
+/* Colunas queda (esconder em modo não-geral) */
+.col-queda {
+  display: table-cell;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tabela-devils th,
+  .tabela-devils td {
+    padding: 12px 8px;
+    font-size: 0.75rem;
+  }
+  
+  .td-equipe {
+    padding-left: 12px;
+  }
+  
+  .td-pt {
+    padding: 12px;
+    font-size: 1rem;
+  }
+  
+  .equipe-nome {
+    font-size: 0.75rem;
+  }
+  
+  .avatar-fallback-tabela,
+  .team-logo-tabela {
+    width: 28px;
+    height: 28px;
+  }
+}

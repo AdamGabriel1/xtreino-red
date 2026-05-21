@@ -1,42 +1,13 @@
-// Tabela de pontuação por posição (PP) do Battle Royale
-const TABELA_PONTOS = { 1: 12, 2: 9, 3: 7, 4: 5, 5: 4, 6: 3, 7: 2 };
+// Tabela de pontuação DEVILS MOBILE LEAGUE
+const TABELA_PONTOS_DEVILS = { 
+  1: 12, 2: 10, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1 
+};
 
 export function calcularPontosPosicao(posicao) {
-  return TABELA_PONTOS[posicao] || 1;
+  return TABELA_PONTOS_DEVILS[posicao] || 0;
 }
 
-export function ordenarTimes(lista) {
-  return [...lista].sort((a, b) => b.pt - a.pt || b.total_pk - a.total_pk);
-}
-
-export function encontrarMelhorTime(lista) {
-  if (!lista.length) return null;
-  return lista[0];
-}
-
-export function encontrarTopFragger(lista) {
-  let top = { nome: '', kills: 0, time: '' };
-  lista.forEach(time => {
-    time.jogadores.forEach(j => {
-      if (j.total_kills > top.kills) {
-        top = { nome: j.nome, kills: j.total_kills, time: time.nome };
-      }
-    });
-  });
-  return top;
-}
-
-export function encontrarTopMVP(lista) {
-  let top = { nome: '', mvps: 0, time: '' };
-  lista.forEach(time => {
-    time.jogadores.forEach(j => {
-      if (j.mvp > top.mvps) {
-        top = { nome: j.nome, mvps: j.mvp, time: time.nome };
-      }
-    });
-  });
-  return top;
-}
+// ... (mantenha as funções existentes: ordenarTimes, encontrarMelhorTime, etc.)
 
 export function processarDadosDoDia(dadosDoDia) {
   let resumoTimes = {};
@@ -60,6 +31,9 @@ export function processarDadosDoDia(dadosDoDia) {
         q1_pp: calcularPontosPosicao(q1_pos),
         q2_pp: calcularPontosPosicao(q2_pos),
         q3_pp: calcularPontosPosicao(q3_pos),
+        q1_pos: q1_pos,
+        q2_pos: q2_pos,
+        q3_pos: q3_pos,
         total_pk: 0,
         jogadores: [],
         mvps_time: 0,
@@ -81,14 +55,36 @@ export function processarDadosDoDia(dadosDoDia) {
       mvp: mvp,
       q1_pos: q1_pos,
       q2_pos: q2_pos,
-      q3_pos: q3_pos
+      q3_pos: q3_pos,
+      q1_k: q1_k,
+      q2_k: q2_k,
+      q3_k: q3_k
     });
   });
 
   let listaFinal = Object.values(resumoTimes).map(time => {
     const total_pp = time.q1_pp + time.q2_pp + time.q3_pp;
     const pt = total_pp + time.total_pk;
-    return { ...time, total_pp, pt };
+    
+    // Calcular booyahs (vitórias)
+    let strikes = 0;
+    if (time.q1_pos === 1) strikes++;
+    if (time.q2_pos === 1) strikes++;
+    if (time.q3_pos === 1) strikes++;
+    
+    // Calcular posição média
+    const posicoesValidas = [time.q1_pos, time.q2_pos, time.q3_pos].filter(p => p > 0);
+    const posicao_media = posicoesValidas.length > 0 
+      ? (posicoesValidas.reduce((a, b) => a + b, 0) / posicoesValidas.length).toFixed(1)
+      : "0.0";
+
+    return { 
+      ...time, 
+      total_pp, 
+      pt,
+      strikes,
+      posicao_media
+    };
   });
 
   listaFinal = ordenarTimes(listaFinal);
