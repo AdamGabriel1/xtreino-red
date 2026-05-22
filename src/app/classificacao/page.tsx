@@ -5,6 +5,9 @@ import { useEffect, useMemo, useState } from "react"
 import { loadCSV } from "@/lib/csv"
 import { calculateTeamRanking } from "@/lib/ranking"
 
+import { TopThree } from "@/components/tables/top-three"
+import { StatsCards } from "@/components/tables/stats-cards"
+
 export default function ClassificacaoPage() {
   const [players, setPlayers] = useState<any[]>([])
   const [placements, setPlacements] = useState<any[]>([])
@@ -111,9 +114,13 @@ export default function ClassificacaoPage() {
 
       </div>
 
-      <div className="overflow-x-auto">
+      <TopThree ranking={ranking} />
 
-        <table className="w-full min-w-[1000px]">
+      <StatsCards ranking={ranking} />
+
+      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
+
+        <table className="w-full min-w-[400px]">
 
           <thead>
             <tr className="border-b border-zinc-800 text-left">
@@ -137,10 +144,18 @@ export default function ClassificacaoPage() {
             {ranking.map((team: any, index) => (
               <tr
                 key={team.team}
-                className="border-b border-zinc-900 hover:bg-zinc-900/50"
+                className={`
+                border-b border-zinc-900
+                ${index === 0 ? "bg-yellow-500/10" : ""}
+                ${index === 1 ? "bg-zinc-400/10" : ""}
+                ${index === 2 ? "bg-orange-700/10" : ""}
+                `}
               >
                 <td className="py-5 font-black text-red-500">
-                  #{index + 1}
+                  {index === 0 && "👑"}
+                  {index === 1 && "🥈"}
+                  {index === 2 && "🥉"}
+                  {index > 2 && `#${index + 1}`}
                 </td>
 
                 <td className="font-bold">

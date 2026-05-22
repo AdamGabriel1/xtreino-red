@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react"
 
 import { loadCSV } from "@/lib/csv"
 
+import { calculateMVP } from "@/lib/mvp"
+import { MVPCard } from "@/components/tables/mvp-card"
+
 export default function JogadoresPage() {
   const [players, setPlayers] = useState<any[]>([])
 
@@ -68,6 +71,10 @@ export default function JogadoresPage() {
         .sort((a, b) => b.total - a.total)
     }, [players, selectedDay, filter])
 
+    const mvp = useMemo(() => {
+    return calculateMVP(ranking)
+    }, [ranking])
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
 
@@ -128,9 +135,11 @@ export default function JogadoresPage() {
 
       </div>
 
-      <div className="overflow-x-auto">
+      <MVPCard mvp={mvp} />
 
-        <table className="w-full min-w-[1000px]">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
+
+        <table className="w-full min-w-[400px]">
 
           <thead>
             <tr className="border-b border-zinc-800">
