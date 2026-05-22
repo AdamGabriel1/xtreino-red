@@ -10,10 +10,17 @@ import {
 
 import { loadCSV } from "@/lib/csv"
 
+import { calculatePlayerStats } from "@/lib/player-stats"
+
 import { getPlayerBadges } from "@/lib/badges"
 
-export default function PlayersPageClient() {
+interface Props {
+  playerName: string
+}
 
+export default function PlayerPageClient({
+  playerName,
+}: Props) {
   const [players, setPlayers] =
     useState<any[]>([])
 
@@ -23,14 +30,8 @@ export default function PlayersPageClient() {
   const [selectedDay, setSelectedDay] =
     useState("Todos")
 
-  const [filter, setFilter] =
-    useState("TOTAL")
-
-  // LOAD CSV
   useEffect(() => {
-
     async function loadData() {
-
       const data = await loadCSV(
         "/data/jogadores.csv"
       )
@@ -39,61 +40,66 @@ export default function PlayersPageClient() {
     }
 
     loadData()
-
   }, [])
+
+  // FILTRAR JOGADOR
+  const playerMatches =
+    useMemo(() => {
+      return players.filter(
+        (player) =>
+          player.Jogador ===
+          playerName
+      )
+    }, [players, playerName])
 
   // MESES
   const availableMonths =
     useMemo(() => {
-
       return [
         "Todos",
 
         ...new Set(
-          players.map(
-            (player) => player.Mes
+          playerMatches.map(
+            (player) =>
+              player.Mes
           )
         ),
       ]
-
-    }, [players])
+    }, [playerMatches])
 
   // DIAS
-  const availableDays =
-    useMemo(() => {
+  const availableDays = useMemo(() => {
 
-      let filtered = players
+    let filtered =
+      playerMatches
 
-      if (
-        selectedMonth !== "Todos"
-      ) {
-        filtered = filtered.filter(
+    if (selectedMonth !== "Todos") {
+      filtered = filtered.filter(
+        (player) =>
+          player.Mes ===
+          selectedMonth
+      )
+    }
+
+    return [
+      "Todos",
+
+      ...new Set(
+        filtered.map(
           (player) =>
-            player.Mes ===
-            selectedMonth
+            player.Dia
         )
-      }
+      ),
+    ]
+  }, [
+    playerMatches,
+    selectedMonth,
+  ])
 
-      return [
-        "Todos",
-
-        ...new Set(
-          filtered.map(
-            (player) => player.Dia
-          )
-        ),
-      ]
-
-    }, [
-      players,
-      selectedMonth,
-    ])
-
-  // FILTRAR
-  const filteredPlayers =
+  // FILTRADOS
+  const filteredMatches =
     useMemo(() => {
-
-      return players.filter(
+      return playerMatches.filter(
         (player) => {
 
           const monthMatch =
@@ -118,250 +124,266 @@ export default function PlayersPageClient() {
           )
         }
       )
-
     }, [
-      players,
+      playerMatches,
       selectedMonth,
       selectedDay,
     ])
 
-  // RANKING
-  const ranking = useMemo(() => {
-
-    const playersMap =
-      new Map()
-
-    filteredPlayers.forEach(
-      (player) => {
-
-        const playerName =
-          player.Jogador
-
-        if (
-          !playersMap.has(
-            playerName
-          )
-        ) {
-
-          playersMap.set(
-            playerName,
-            {
-              Jogador:
-                player.Jogador,
-
-              Time:
-                player.Time,
-
-              q1: Number(
-                player.Q1_Kills ||
-                  0
-              ),
-
-              q2: Number(
-                player.Q2_Kills ||
-                  0
-              ),
-
-              q3: Number(
-                player.Q3_Kills ||
-                  0
-              ),
-
-              total: 0,
-            }
-          )
-
-        } else {
-
-          const current =
-            playersMap.get(
-              playerName
-            )
-
-          current.q1 += Number(
-            player.Q1_Kills ||
-              0
-          )
-
-          current.q2 += Number(
-            player.Q2_Kills ||
-              0
-          )
-
-          current.q3 += Number(
-            player.Q3_Kills ||
-              0
-          )
-        }
-      }
+  // STATS
+  const stats = useMemo(() => {
+    return calculatePlayerStats(
+      filteredMatches,
+      playerName
     )
-
-    const result = Array.from(
-      playersMap.values()
-    )
-
-    result.forEach(
-      (player: any) => {
-
-        player.total =
-          player.q1 +
-          player.q2 +
-          player.q3
-
-        if (filter === "Q1") {
-          player.total =
-            player.q1
-        }
-
-        if (filter === "Q2") {
-          player.total =
-            player.q2
-        }
-
-        if (filter === "Q3") {
-          player.total =
-            player.q3
-        }
-      }
-    )
-
-    return result.sort(
-      (a: any, b: any) =>
-        b.total - a.total
-    )
-
   }, [
-    filteredPlayers,
-    filter,
+    filteredMatches,
+    playerName,
   ])
+
+  const latestMatch =
+    filteredMatches[
+      filteredMatches.length - 1
+    ]
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
 
+      {/* VOLTAR */}
+      <Link
+        href="/jogadores"
+        className="inline-flex mb-8 text-zinc-400 hover:text-white transition"
+      >
+        ← Voltar
+      </Link>
+
       {/* HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
+      <div className="bg-gradient-to-br from-red-950/20 to-black border border-zinc-800 rounded-3xl p-10 mb-10">
 
-        <div>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
 
-          <h1 className="text-5xl font-black">
-            JOGADORES
-          </h1>
+          {/* INFO */}
+          <div>
 
-          <p className="text-zinc-400 mt-3">
-            Ranking individual
-            dos jogadores.
-          </p>
+            <div className="inline-flex bg-red-600 px-4 py-2 rounded-xl font-bold mb-6">
+              JOGADOR
+            </div>
 
-        </div>
+            <h1 className="text-5xl md:text-6xl font-black break-words">
+              {playerName}
+            </h1>
 
-        {/* FILTROS */}
-        <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap items-center gap-3 mt-5">
 
-          {/* MÊS */}
-          <select
-            value={selectedMonth}
-            onChange={(e) => {
+              <div className="bg-zinc-900 border border-zinc-700 px-4 py-2 rounded-xl">
+                {
+                  stats.latestTeam
+                }
+              </div>
 
-              setSelectedMonth(
-                e.target.value
-              )
+              {latestMatch &&
+                getPlayerBadges(
+                  latestMatch
+                ).map((badge) => (
+                  <div
+                    key={badge}
+                    className="bg-zinc-900 border border-zinc-700 px-3 py-2 rounded-xl text-xl"
+                  >
+                    {badge}
+                  </div>
+                ))}
 
-              setSelectedDay(
-                "Todos"
-              )
-            }}
-            className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3"
-          >
+            </div>
 
-            {availableMonths.map(
-              (month) => (
-                <option
-                  key={month}
-                  value={month}
-                >
-                  {month}
-                </option>
-              )
-            )}
+          </div>
 
-          </select>
+          {/* STATS */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
-          {/* DIA */}
-          <select
-            value={selectedDay}
-            onChange={(e) =>
-              setSelectedDay(
-                e.target.value
-              )
-            }
-            className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3"
-          >
+            <div className="bg-black/40 border border-zinc-800 rounded-2xl p-5 text-center">
 
-            {availableDays.map(
-              (day) => (
-                <option
-                  key={day}
-                  value={day}
-                >
-                  {day === "Todos"
-                    ? "Todos os dias"
-                    : `Dia ${day}`}
-                </option>
-              )
-            )}
+              <div className="text-4xl font-black text-red-500">
+                {
+                  stats.totalKills
+                }
+              </div>
 
-          </select>
+              <p className="text-zinc-400 mt-2 text-sm">
+                TOTAL KILLS
+              </p>
 
-          {/* FILTRO */}
-          <select
-            value={filter}
-            onChange={(e) =>
-              setFilter(
-                e.target.value
-              )
-            }
-            className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3"
-          >
+            </div>
 
-            <option value="TOTAL">
-              TOTAL
-            </option>
+            <div className="bg-black/40 border border-zinc-800 rounded-2xl p-5 text-center">
 
-            <option value="Q1">
-              Q1
-            </option>
+              <div className="text-4xl font-black text-red-500">
+                {
+                  stats.averageKills
+                }
+              </div>
 
-            <option value="Q2">
-              Q2
-            </option>
+              <p className="text-zinc-400 mt-2 text-sm">
+                MÉDIA
+              </p>
 
-            <option value="Q3">
-              Q3
-            </option>
+            </div>
 
-          </select>
+            <div className="bg-black/40 border border-zinc-800 rounded-2xl p-5 text-center">
+
+              <div className="text-4xl font-black text-red-500">
+                {
+                  stats.bestMatch
+                }
+              </div>
+
+              <p className="text-zinc-400 mt-2 text-sm">
+                RECORD
+              </p>
+
+            </div>
+
+            <div className="bg-black/40 border border-zinc-800 rounded-2xl p-5 text-center">
+
+              <div className="text-4xl font-black text-red-500">
+                {
+                  stats.mvpCount
+                }
+              </div>
+
+              <p className="text-zinc-400 mt-2 text-sm">
+                MVPs
+              </p>
+
+            </div>
+
+          </div>
 
         </div>
 
       </div>
 
-      {/* TABELA */}
+      {/* FILTROS */}
+      <div className="flex flex-wrap gap-4 mb-8">
+
+        {/* MÊS */}
+        <select
+          value={selectedMonth}
+          onChange={(e) => {
+
+            setSelectedMonth(
+              e.target.value
+            )
+
+            setSelectedDay(
+              "Todos"
+            )
+          }}
+          className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3"
+        >
+
+          {availableMonths.map(
+            (month) => (
+              <option
+                key={month}
+                value={month}
+              >
+                {month}
+              </option>
+            )
+          )}
+
+        </select>
+
+        {/* DIA */}
+        <select
+          value={selectedDay}
+          onChange={(e) =>
+            setSelectedDay(
+              e.target.value
+            )
+          }
+          className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3"
+        >
+
+          {availableDays.map(
+            (day) => (
+              <option
+                key={day}
+                value={day}
+              >
+                {day === "Todos"
+                  ? "Todos os dias"
+                  : `Dia ${day}`}
+              </option>
+            )
+          )}
+
+        </select>
+
+      </div>
+
+      {/* QUEDAS */}
+      <div className="grid lg:grid-cols-3 gap-6 mb-10">
+
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+
+          <p className="text-zinc-500">
+            Kills na Q1
+          </p>
+
+          <h2 className="text-5xl font-black mt-4">
+            {stats.totalQ1}
+          </h2>
+
+        </div>
+
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+
+          <p className="text-zinc-500">
+            Kills na Q2
+          </p>
+
+          <h2 className="text-5xl font-black mt-4">
+            {stats.totalQ2}
+          </h2>
+
+        </div>
+
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+
+          <p className="text-zinc-500">
+            Kills na Q3
+          </p>
+
+          <h2 className="text-5xl font-black mt-4">
+            {stats.totalQ3}
+          </h2>
+
+        </div>
+
+      </div>
+
+      {/* HISTÓRICO */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
+
+        <div className="p-6 border-b border-zinc-800">
+
+          <h2 className="text-2xl font-black">
+            HISTÓRICO
+          </h2>
+
+        </div>
 
         <div className="overflow-x-auto">
 
-          <table className="w-full min-w-[1000px]">
+          <table className="w-full min-w-[900px]">
 
             <thead>
 
               <tr className="border-b border-zinc-800">
 
                 <th className="text-left py-5 px-6">
-                  #
-                </th>
-
-                <th className="text-left">
-                  JOGADOR
+                  DATA
                 </th>
 
                 <th className="text-left">
@@ -390,98 +412,45 @@ export default function PlayersPageClient() {
 
             <tbody>
 
-              {ranking.map(
+              {stats.matches.map(
                 (
-                  player: any,
+                  match: any,
                   index
                 ) => (
                   <tr
-                    key={
-                      player.Jogador
-                    }
+                    key={index}
                     className="border-b border-zinc-800 hover:bg-zinc-800/30 transition"
                   >
 
-                    <td className="py-5 px-6 text-red-500 font-black">
-                      #{index + 1}
+                    <td className="py-5 px-6">
+                      {match.Mes}{" "}
+                      {match.Dia}
                     </td>
 
                     <td className="font-bold">
-
-                      <div className="flex items-center gap-3">
-
-                        <Link
-                          href={`/jogadores/${encodeURIComponent(player.Jogador)}`}
-                          className="hover:text-red-500 transition"
-                        >
-                          {
-                            player.Jogador
-                          }
-                        </Link>
-
-                        <div className="flex gap-1">
-
-                          {getPlayerBadges(
-                            player
-                          ).map(
-                            (
-                              badge
-                            ) => (
-                              <span
-                                key={
-                                  badge
-                                }
-                              >
-                                {
-                                  badge
-                                }
-                              </span>
-                            )
-                          )}
-
-                        </div>
-
-                      </div>
-
-                    </td>
-
-                    <td>
-                      {player.Time}
+                      {match.Time}
                     </td>
 
                     <td className="text-center">
-                      {player.q1}
+                      {match.q1}
                     </td>
 
                     <td className="text-center">
-                      {player.q2}
+                      {match.q2}
                     </td>
 
                     <td className="text-center">
-                      {player.q3}
+                      {match.q3}
                     </td>
 
                     <td className="text-center text-red-500 font-black">
-                      {player.total}
+                      {
+                        match.totalKills
+                      }
                     </td>
 
                   </tr>
                 )
-              )}
-
-              {ranking.length ===
-                0 && (
-                <tr>
-
-                  <td
-                    colSpan={7}
-                    className="text-center py-16 text-zinc-500"
-                  >
-                    Nenhum jogador
-                    encontrado.
-                  </td>
-
-                </tr>
               )}
 
             </tbody>
