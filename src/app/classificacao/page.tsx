@@ -8,6 +8,8 @@ import { calculateTeamRanking } from "@/lib/ranking"
 import { TopThree } from "@/components/tables/top-three"
 import { StatsCards } from "@/components/tables/stats-cards"
 
+import Link from "next/link"
+
 export default function ClassificacaoPage() {
   const [players, setPlayers] = useState<any[]>([])
   const [placements, setPlacements] = useState<any[]>([])
@@ -159,9 +161,16 @@ export default function ClassificacaoPage() {
                 </td>
 
                 <td className="font-bold">
-                  {team.team}
-                </td>
 
+                  <Link
+                    href={`/times/${encodeURIComponent(team.team)}`}
+                    className="hover:text-red-500 transition"
+                  >
+                    {team.team}
+                  </Link>
+
+                </td>
+                
                 <td>{team.q1Kills}</td>
                 <td>{team.q2Kills}</td>
                 <td>{team.q3Kills}</td>
