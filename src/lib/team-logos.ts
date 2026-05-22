@@ -2,7 +2,7 @@ export const teamLogos: Record<
   string,
   string
 > = {
-  UGD: "/teams/ugd.png",
+  UGD: "/teams/ugd.jpg",
 
   RED: "/teams/red.png",
 
