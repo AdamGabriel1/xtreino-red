@@ -1,9 +1,9 @@
-Mes,Dia,Time,Q1_Pos,Q2_Pos,Q3_Pos
-Maio,19,UGD,1,2,1
-Maio,19,RED,5,7,3
-Maio,19,LMF,8,6,9
-Maio,19,KOV,2,4,5
-Maio,19,CMF,3,1,4
+Mes;Dia;Time;Q1_Pos;Q2_Pos;Q3_Pos
+Maio;19;UGD;1;2;1
+Maio;19;RED;5;7;3
+Maio;19;LMF;8;6;9
+Maio;19;KOV;2;4;5
+Maio;19;CMF;3;1;4
 
 Maio;21;UGD;1;3;4
 Maio;21;Time I;2;6;3
