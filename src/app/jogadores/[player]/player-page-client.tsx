@@ -376,7 +376,7 @@ export default function PlayerPageClient({
 
         <div className="overflow-x-auto">
 
-          <table className="w-full min-w-[900px]">
+          <table className="w-full min-w-[640px]">
 
             <thead>
 
