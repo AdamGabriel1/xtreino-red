@@ -13,6 +13,7 @@ import { loadCSV } from "@/lib/csv"
 import { getPlayerBadges } from "@/lib/badges"
 
 export default function PlayersPageClient() {
+
   const [players, setPlayers] =
     useState<any[]>([])
 
@@ -25,8 +26,11 @@ export default function PlayersPageClient() {
   const [filter, setFilter] =
     useState("TOTAL")
 
+  // LOAD CSV
   useEffect(() => {
+
     async function loadData() {
+
       const data = await loadCSV(
         "/data/jogadores.csv"
       )
@@ -35,11 +39,13 @@ export default function PlayersPageClient() {
     }
 
     loadData()
+
   }, [])
 
   // MESES
   const availableMonths =
     useMemo(() => {
+
       return [
         "Todos",
 
@@ -49,48 +55,70 @@ export default function PlayersPageClient() {
           )
         ),
       ]
+
     }, [players])
 
   // DIAS
-  const availableDays = useMemo(() => {
-    let filtered = players
+  const availableDays =
+    useMemo(() => {
 
-    if (selectedMonth !== "Todos") {
-      filtered = filtered.filter(
-        (player) =>
-          player.Mes === selectedMonth
-      )
-    }
+      let filtered = players
 
-    return [
-      "Todos",
-
-      ...new Set(
-        filtered.map(
-          (player) => player.Dia
+      if (
+        selectedMonth !== "Todos"
+      ) {
+        filtered = filtered.filter(
+          (player) =>
+            player.Mes ===
+            selectedMonth
         )
-      ),
-    ]
-  }, [players, selectedMonth])
+      }
 
-  // FILTRADOS
+      return [
+        "Todos",
+
+        ...new Set(
+          filtered.map(
+            (player) => player.Dia
+          )
+        ),
+      ]
+
+    }, [
+      players,
+      selectedMonth,
+    ])
+
+  // FILTRAR
   const filteredPlayers =
     useMemo(() => {
-      return players.filter((player) => {
 
-        const monthMatch =
-          selectedMonth === "Todos" ||
-          player.Mes === selectedMonth
+      return players.filter(
+        (player) => {
 
-        const dayMatch =
-          selectedDay === "Todos" ||
-          String(player.Dia) ===
-            String(selectedDay)
+          const monthMatch =
+            selectedMonth ===
+              "Todos" ||
+            player.Mes ===
+              selectedMonth
 
-        return (
-          monthMatch && dayMatch
-        )
-      })
+          const dayMatch =
+            selectedDay ===
+              "Todos" ||
+            String(
+              player.Dia
+            ) ===
+              String(
+                selectedDay
+              )
+
+          return (
+            monthMatch &&
+            dayMatch
+          )
+        }
+      )
+
     }, [
       players,
       selectedMonth,
@@ -100,52 +128,69 @@ export default function PlayersPageClient() {
   // RANKING
   const ranking = useMemo(() => {
 
-    const playersMap = new Map()
+    const playersMap =
+      new Map()
 
     filteredPlayers.forEach(
       (player) => {
 
-        const name =
+        const playerName =
           player.Jogador
 
         if (
-          !playersMap.has(name)
+          !playersMap.has(
+            playerName
+          )
         ) {
-          playersMap.set(name, {
-            ...player,
 
-            q1:
-              Number(
-                player.Q1_Kills
-              ) || 0,
+          playersMap.set(
+            playerName,
+            {
+              Jogador:
+                player.Jogador,
 
-            q2:
-              Number(
-                player.Q2_Kills
-              ) || 0,
+              Time:
+                player.Time,
 
-            q3:
-              Number(
-                player.Q3_Kills
-              ) || 0,
+              q1: Number(
+                player.Q1_Kills ||
+                  0
+              ),
 
-            total: 0,
-          })
+              q2: Number(
+                player.Q2_Kills ||
+                  0
+              ),
+
+              q3: Number(
+                player.Q3_Kills ||
+                  0
+              ),
+
+              total: 0,
+            }
+          )
+
         } else {
 
           const current =
-            playersMap.get(name)
+            playersMap.get(
+              playerName
+            )
 
           current.q1 += Number(
-            player.Q1_Kills
+            player.Q1_Kills ||
+              0
           )
 
           current.q2 += Number(
-            player.Q2_Kills
+            player.Q2_Kills ||
+              0
           )
 
           current.q3 += Number(
-            player.Q3_Kills
+            player.Q3_Kills ||
+              0
           )
         }
       }
@@ -184,7 +229,11 @@ export default function PlayersPageClient() {
       (a: any, b: any) =>
         b.total - a.total
     )
-  }, [filteredPlayers, filter])
+
+  }, [
+    filteredPlayers,
+    filter,
+  ])
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -199,8 +248,8 @@ export default function PlayersPageClient() {
           </h1>
 
           <p className="text-zinc-400 mt-3">
-            Ranking individual dos
-            jogadores.
+            Ranking individual
+            dos jogadores.
           </p>
 
         </div>
@@ -347,7 +396,9 @@ export default function PlayersPageClient() {
                   index
                 ) => (
                   <tr
-                    key={player.Jogador}
+                    key={
+                      player.Jogador
+                    }
                     className="border-b border-zinc-800 hover:bg-zinc-800/30 transition"
                   >
 
@@ -416,6 +467,21 @@ export default function PlayersPageClient() {
 
                   </tr>
                 )
+              )}
+
+              {ranking.length ===
+                0 && (
+                <tr>
+
+                  <td
+                    colSpan={7}
+                    className="text-center py-16 text-zinc-500"
+                  >
+                    Nenhum jogador
+                    encontrado.
+                  </td>
+
+                </tr>
               )}
 
             </tbody>
