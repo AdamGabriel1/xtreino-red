@@ -1,20 +1,37 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-
-import { loadCSV } from "@/lib/csv"
-import { calculateTeamRanking } from "@/lib/ranking"
-
-import { TopThree } from "@/components/tables/top-three"
-import { StatsCards } from "@/components/tables/stats-cards"
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 import Link from "next/link"
+
+import { loadCSV } from "@/lib/csv"
+
+import { calculateTeamRanking } from "@/lib/ranking"
+
+import {
+  getAvailableMonths,
+  getAvailableDays,
+} from "@/lib/filters"
+
+import { TopThree } from "@/components/tables/top-three"
+
+import { StatsCards } from "@/components/tables/stats-cards"
 
 import { TeamLogo } from "@/components/ui/team-logo"
 
 export default function ClassificacaoPage() {
-  const [players, setPlayers] = useState<any[]>([])
-  const [placements, setPlacements] = useState<any[]>([])
+  const [players, setPlayers] =
+    useState<any[]>([])
+
+  const [placements, setPlacements] =
+    useState<any[]>([])
+
+  const [selectedMonth, setSelectedMonth] =
+    useState("Maio")
 
   const [selectedDay, setSelectedDay] =
     useState("19")
@@ -28,33 +45,53 @@ export default function ClassificacaoPage() {
         "/data/jogadores.csv"
       )
 
-      const placementData = await loadCSV(
-        "/data/colocacoes.csv"
-      )
+      const placementData =
+        await loadCSV(
+          "/data/colocacoes.csv"
+        )
 
       setPlayers(playersData)
+
       setPlacements(placementData)
     }
 
     loadData()
   }, [])
 
-  const availableDays = useMemo(() => {
-    const uniqueDays = [
-      ...new Set(players.map((p) => p.Dia)),
-    ]
-
-    return uniqueDays
+  const availableMonths = useMemo(() => {
+    return getAvailableMonths(players)
   }, [players])
+
+  const availableDays = useMemo(() => {
+    return getAvailableDays(
+      players,
+      selectedMonth
+    )
+  }, [players, selectedMonth])
+
+  useEffect(() => {
+    if (availableDays.length > 0) {
+      setSelectedDay(
+        String(availableDays[0])
+      )
+    }
+  }, [selectedMonth])
 
   const ranking = useMemo(() => {
     return calculateTeamRanking(
       players,
       placements,
+      selectedMonth,
       selectedDay,
       filter
     )
-  }, [players, placements, selectedDay, filter])
+  }, [
+    players,
+    placements,
+    selectedMonth,
+    selectedDay,
+    filter,
+  ])
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -62,6 +99,7 @@ export default function ClassificacaoPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
 
         <div>
+
           <h1 className="text-4xl font-black">
             CLASSIFICAÇÃO
           </h1>
@@ -69,19 +107,46 @@ export default function ClassificacaoPage() {
           <p className="text-zinc-400 mt-2">
             Ranking oficial dos xtreinos.
           </p>
+
         </div>
 
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4 mb-8">
+      <div className="grid md:grid-cols-3 gap-4 mb-8">
+
+        <select
+          value={selectedMonth}
+          onChange={(e) =>
+            setSelectedMonth(
+              e.target.value
+            )
+          }
+          className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-4"
+        >
+
+          {availableMonths.map(
+            (month) => (
+              <option
+                key={month}
+                value={month}
+              >
+                {month}
+              </option>
+            )
+          )}
+
+        </select>
 
         <select
           value={selectedDay}
           onChange={(e) =>
-            setSelectedDay(e.target.value)
+            setSelectedDay(
+              e.target.value
+            )
           }
           className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-4"
         >
+
           {availableDays.map((day) => (
             <option
               key={day}
@@ -90,6 +155,7 @@ export default function ClassificacaoPage() {
               Dia {day}
             </option>
           ))}
+
         </select>
 
         <select
@@ -99,6 +165,7 @@ export default function ClassificacaoPage() {
           }
           className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-4"
         >
+
           <option value="TOTAL">
             Total
           </option>
@@ -114,6 +181,7 @@ export default function ClassificacaoPage() {
           <option value="Q3">
             Queda 3
           </option>
+
         </select>
 
       </div>
@@ -124,80 +192,158 @@ export default function ClassificacaoPage() {
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
 
-        <table className="w-full min-w-[360px]">
+        <div className="overflow-x-auto">
 
-          <thead>
-            <tr className="border-b border-zinc-800 text-left">
+          <table className="w-full min-w-[900px]">
 
-              <th className="py-4">#</th>
-              <th>TIME</th>
+            <thead>
 
-              <th>Q1</th>
-              <th>Q2</th>
-              <th>Q3</th>
+              <tr className="border-b border-zinc-800 text-left">
 
-              <th>KILLS</th>
-              <th>POSIÇÃO</th>
-              <th>TOTAL</th>
+                <th className="py-4 px-4">
+                  #
+                </th>
 
-            </tr>
-          </thead>
+                <th className="px-4">
+                  TIME
+                </th>
 
-          <tbody>
+                <th className="px-4">
+                  Q1
+                </th>
 
-            {ranking.map((team: any, index) => (
-              <tr
-                key={team.team}
-                className={`
-                border-b border-zinc-900
-                ${index === 0 ? "bg-yellow-500/10" : ""}
-                ${index === 1 ? "bg-zinc-400/10" : ""}
-                ${index === 2 ? "bg-orange-700/10" : ""}
-                `}
-              >
-                <td className="py-5 font-black text-red-500">
-                  {index === 0 && "👑"}
-                  {index === 1 && "🥈"}
-                  {index === 2 && "🥉"}
-                  {index > 2 && `#${index + 1}`}
-                </td>
+                <th className="px-4">
+                  Q2
+                </th>
 
-                <td>
+                <th className="px-4">
+                  Q3
+                </th>
 
-                  <Link
-                    href={`/times/${encodeURIComponent(team.team)}`}
-                    className="flex items-center gap-4 font-bold hover:text-red-500 transition"
+                <th className="px-4">
+                  KILLS
+                </th>
+
+                <th className="px-4">
+                  POSIÇÃO
+                </th>
+
+                <th className="px-4">
+                  TOTAL
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {ranking.map(
+                (
+                  team: any,
+                  index
+                ) => (
+                  <tr
+                    key={team.team}
+                    className={`
+                    border-b border-zinc-800
+                    hover:bg-zinc-800/30
+                    transition
+
+                    ${
+                      index === 0
+                        ? "bg-yellow-500/10"
+                        : ""
+                    }
+
+                    ${
+                      index === 1
+                        ? "bg-zinc-400/10"
+                        : ""
+                    }
+
+                    ${
+                      index === 2
+                        ? "bg-orange-700/10"
+                        : ""
+                    }
+                  `}
                   >
 
-                    <TeamLogo team={team.team} />
+                    <td className="py-5 px-4 font-black text-red-500">
 
-                    {team.team}
+                      {index === 0 &&
+                        "👑"}
 
-                  </Link>
+                      {index === 1 &&
+                        "🥈"}
 
-                </td>
+                      {index === 2 &&
+                        "🥉"}
 
-                <td>{team.q1Kills}</td>
-                <td>{team.q2Kills}</td>
-                <td>{team.q3Kills}</td>
+                      {index > 2 &&
+                        `#${index + 1}`}
 
-                <td className="font-bold">
-                  {team.totalKills}
-                </td>
+                    </td>
 
-                <td>
-                  {team.totalPlacement}
-                </td>
+                    <td className="px-4">
 
-                <td className="text-red-500 font-black text-xl">
-                  {team.totalPoints}
-                </td>
-              </tr>
-            ))}
+                      <Link
+                        href={`/times/${encodeURIComponent(team.team)}`}
+                        className="flex items-center gap-4 font-bold hover:text-red-500 transition"
+                      >
 
-          </tbody>
+                        <TeamLogo
+                          team={team.team}
+                        />
 
-        </table>
+                        <span>
+                          {team.team}
+                        </span>
+
+                      </Link>
+
+                    </td>
+
+                    <td className="px-4">
+                      {team.q1Kills}
+                    </td>
+
+                    <td className="px-4">
+                      {team.q2Kills}
+                    </td>
+
+                    <td className="px-4">
+                      {team.q3Kills}
+                    </td>
+
+                    <td className="px-4 font-bold">
+                      {
+                        team.totalKills
+                      }
+                    </td>
+
+                    <td className="px-4">
+                      {
+                        team.totalPlacement
+                      }
+                    </td>
+
+                    <td className="px-4 text-red-500 font-black text-xl">
+                      {
+                        team.totalPoints
+                      }
+                    </td>
+
+                  </tr>
+                )
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
 
