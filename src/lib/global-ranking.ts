@@ -6,8 +6,13 @@ export function calculateGlobalRanking(
 ) {
   const teamsMap = new Map()
 
+  // PLAYERS
   players.forEach((player) => {
-    const team = player.Time
+    const team = String(
+      player.Time || ""
+    ).trim()
+
+    if (!team) return
 
     if (!teamsMap.has(team)) {
       teamsMap.set(team, {
@@ -24,27 +29,42 @@ export function calculateGlobalRanking(
     const current = teamsMap.get(team)
 
     current.kills +=
-      player.Q1_Kills +
-      player.Q2_Kills +
-      player.Q3_Kills
+      Number(player.Q1_Kills || 0) +
+      Number(player.Q2_Kills || 0) +
+      Number(player.Q3_Kills || 0)
   })
 
+  // PLACEMENTS
   placements.forEach((placement) => {
-    const current = teamsMap.get(
-      placement.Time
-    )
+    const team = String(
+      placement.Time || ""
+    ).trim()
 
-    if (!current) return
+    if (!team) return
+
+    if (!teamsMap.has(team)) {
+      teamsMap.set(team, {
+        team,
+
+        kills: 0,
+        placement: 0,
+        total: 0,
+
+        matches: 0,
+      })
+    }
+
+    const current = teamsMap.get(team)
 
     current.placement +=
       (placementPoints[
-        placement.Q1_Pos
+        Number(placement.Q1_Pos)
       ] || 0) +
       (placementPoints[
-        placement.Q2_Pos
+        Number(placement.Q2_Pos)
       ] || 0) +
       (placementPoints[
-        placement.Q3_Pos
+        Number(placement.Q3_Pos)
       ] || 0)
 
     current.matches += 1
@@ -59,14 +79,21 @@ export function calculateGlobalRanking(
       team.kills + team.placement
 
     team.average =
-      (
-        team.total /
-        Math.max(team.matches, 1)
-      ).toFixed(1)
+      team.matches > 0
+        ? (
+            team.total / team.matches
+          ).toFixed(1)
+        : "0.0"
   })
 
-  return teams.sort(
-    (a: any, b: any) =>
-      b.total - a.total
-  )
+  return teams
+    .filter(
+      (team: any) =>
+        team.team &&
+        !Number.isNaN(team.total)
+    )
+    .sort(
+      (a: any, b: any) =>
+        b.total - a.total
+    )
 }
