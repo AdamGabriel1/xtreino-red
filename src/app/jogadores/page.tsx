@@ -3,11 +3,9 @@
 import { useEffect, useMemo, useState } from "react"
 
 import { loadCSV } from "@/lib/csv"
-import { calculateTeamRanking } from "@/lib/ranking"
 
-export default function ClassificacaoPage() {
+export default function JogadoresPage() {
   const [players, setPlayers] = useState<any[]>([])
-  const [placements, setPlacements] = useState<any[]>([])
 
   const [selectedDay, setSelectedDay] =
     useState("19")
@@ -17,52 +15,53 @@ export default function ClassificacaoPage() {
 
   useEffect(() => {
     async function loadData() {
-      const playersData = await loadCSV(
+      const data = await loadCSV(
         "/data/jogadores.csv"
       )
 
-      const placementData = await loadCSV(
-        "/data/colocacoes.csv"
-      )
-
-      setPlayers(playersData)
-      setPlacements(placementData)
+      setPlayers(data)
     }
 
     loadData()
   }, [])
 
   const availableDays = useMemo(() => {
-    const uniqueDays = [
+    return [
       ...new Set(players.map((p) => p.Dia)),
     ]
-
-    return uniqueDays
   }, [players])
 
   const ranking = useMemo(() => {
-    return calculateTeamRanking(
-      players,
-      placements,
-      selectedDay,
-      filter
-    )
-  }, [players, placements, selectedDay, filter])
+    return players
+      .filter((player) =>
+        player.Dia === selectedDay
+      )
+      .map((player) => {
+        const total =
+          player.Q1_Kills +
+          player.Q2_Kills +
+          player.Q3_Kills
+
+        return {
+          ...player,
+          total,
+        }
+      })
+      .sort((a, b) => b.total - a.total)
+  }, [players, selectedDay])
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+      <div className="mb-10">
 
-        <div>
-          <h1 className="text-4xl font-black">
-            CLASSIFICAÇÃO
-          </h1>
+        <h1 className="text-4xl font-black">
+          JOGADORES
+        </h1>
 
-          <p className="text-zinc-400 mt-2">
-            Ranking oficial dos xtreinos.
-          </p>
-        </div>
+        <p className="text-zinc-400 mt-2">
+          Estatísticas individuais.
+        </p>
 
       </div>
 
@@ -113,17 +112,24 @@ export default function ClassificacaoPage() {
         <table className="w-full min-w-[1000px]">
 
           <thead>
-            <tr className="border-b border-zinc-800 text-left">
+            <tr className="border-b border-zinc-800">
 
-              <th className="py-4">#</th>
-              <th>TIME</th>
+              <th className="text-left py-4">
+                #
+              </th>
+
+              <th className="text-left">
+                JOGADOR
+              </th>
+
+              <th className="text-left">
+                TIME
+              </th>
 
               <th>Q1</th>
               <th>Q2</th>
               <th>Q3</th>
 
-              <th>KILLS</th>
-              <th>POSIÇÃO</th>
               <th>TOTAL</th>
 
             </tr>
@@ -131,33 +137,37 @@ export default function ClassificacaoPage() {
 
           <tbody>
 
-            {ranking.map((team: any, index) => (
+            {ranking.map((player, index) => (
               <tr
-                key={team.team}
-                className="border-b border-zinc-900 hover:bg-zinc-900/50"
+                key={player.Jogador}
+                className="border-b border-zinc-900"
               >
-                <td className="py-5 font-black text-red-500">
+                <td className="py-5 text-red-500 font-black">
                   #{index + 1}
                 </td>
 
                 <td className="font-bold">
-                  {team.team}
-                </td>
-
-                <td>{team.q1Kills}</td>
-                <td>{team.q2Kills}</td>
-                <td>{team.q3Kills}</td>
-
-                <td className="font-bold">
-                  {team.totalKills}
+                  {player.Jogador}
                 </td>
 
                 <td>
-                  {team.totalPlacement}
+                  {player.Time}
                 </td>
 
-                <td className="text-red-500 font-black text-xl">
-                  {team.totalPoints}
+                <td className="text-center">
+                  {player.Q1_Kills}
+                </td>
+
+                <td className="text-center">
+                  {player.Q2_Kills}
+                </td>
+
+                <td className="text-center">
+                  {player.Q3_Kills}
+                </td>
+
+                <td className="text-center text-red-500 font-black text-xl">
+                  {player.total}
                 </td>
               </tr>
             ))}
