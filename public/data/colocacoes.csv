@@ -1,5 +1,5 @@
 Mes;Dia;Time;Q1_Pos;Q2_Pos;Q3_Pos
-Maio;19;UGD;1;4;1
+Maio;19;UGD Threat;1;4;1
 Maio;19;RED;2;7;4
 Maio;19;RED Magic BR;3;1;7
 Maio;19;LMF;4;6;5
@@ -7,14 +7,14 @@ Maio;19;KOV;5;5;3
 Maio;19;CMF;7;3;2
 Maio;19;Eternity;6;2;6
 
-Maio;21;UGD;1;3;4
+Maio;21;UGD Threat;1;3;4
 Maio;21;Time I;2;6;3
 Maio;21;CMF;3;4;1
 Maio;21;RED;4;2;2
 Maio;21;KOV;5;1;6
 Maio;21;Time E;6;5;5
 
-Maio;7;UGD;1;1;1
+Maio;7;UGD Threat;1;1;1
 Maio;7;CMF;2;4;5
 Maio;7;INF;3;6;4
 Maio;7;LMF;4;2;6
@@ -22,7 +22,7 @@ Maio;7;Misturado;5;6;3
 Maio;7;Eternity;6;3;6
 Maio;7;RED;6;5;2
 
-Abril;30;UGD;1;1;3
+Abril;30;UGD Threat;1;1;3
 Abril;30;FURY;2;6;6
 Abril;30;RED;3;6;6
 Abril;30;UGD Royal;4;5;6
