@@ -1,17 +1,13 @@
 import { placementPoints } from "./points"
 
 export function calculateTeamRanking(
-  players: any[],
-  placements: any[],
-  selectedDay: string,
-  filter: string
-) {
+players: any[], placements: any[], selectedMonth: string, selectedDay: string, filter: string) {
   const filteredPlayers = players.filter(
-    (player) => String(player.Dia) === String(selectedDay)
+    (player) => String(player.Mes) === String(selectedMonth) && String(player.Dia) === String(selectedDay)
   )
 
   const filteredPlacements = placements.filter(
-    (placement) => String(placement.Dia) === String(selectedDay)
+    (placement) => String(placement.Mes) === String(selectedMonth) && String(placement.Dia) === String(selectedDay)
   )
 
   const teamsMap = new Map()
