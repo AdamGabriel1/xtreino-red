@@ -232,7 +232,7 @@ export default function RankingGeralPage() {
 
         <div className="overflow-x-auto">
 
-          <table className="w-full min-w-[640px]">
+          <table className="w-full min-w-[460px]">
 
             <thead>
 
