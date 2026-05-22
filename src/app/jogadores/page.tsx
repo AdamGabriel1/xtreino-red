@@ -20,6 +20,7 @@ export default function JogadoresPage() {
       )
 
       setPlayers(data)
+      console.log(players)
     }
 
     loadData()
@@ -31,24 +32,41 @@ export default function JogadoresPage() {
     ]
   }, [players])
 
-  const ranking = useMemo(() => {
+    const ranking = useMemo(() => {
     return players
-      .filter((player) =>
-        player.Dia === selectedDay
-      )
-      .map((player) => {
-        const total =
-          player.Q1_Kills +
-          player.Q2_Kills +
-          player.Q3_Kills
+        .filter(
+        (player) =>
+            String(player.Dia) === String(selectedDay)
+        )
+        .map((player) => {
+        let total = 0
+
+        if (filter === "Q1") {
+            total = player.Q1_Kills
+        }
+
+        else if (filter === "Q2") {
+            total = player.Q2_Kills
+        }
+
+        else if (filter === "Q3") {
+            total = player.Q3_Kills
+        }
+
+        else {
+            total =
+            player.Q1_Kills +
+            player.Q2_Kills +
+            player.Q3_Kills
+        }
 
         return {
-          ...player,
-          total,
+            ...player,
+            total,
         }
-      })
-      .sort((a, b) => b.total - a.total)
-  }, [players, selectedDay])
+        })
+        .sort((a, b) => b.total - a.total)
+    }, [players, selectedDay, filter])
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -75,8 +93,11 @@ export default function JogadoresPage() {
           className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-4"
         >
           {availableDays.map((day) => (
-            <option key={day}>
-              Dia {day}
+            <option
+            key={day}
+            value={day}
+            >
+            Dia {day}
             </option>
           ))}
         </select>

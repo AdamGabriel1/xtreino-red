@@ -76,7 +76,10 @@ export default function ClassificacaoPage() {
           className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-4"
         >
           {availableDays.map((day) => (
-            <option key={day}>
+            <option
+              key={day}
+              value={day}
+            >
               Dia {day}
             </option>
           ))}

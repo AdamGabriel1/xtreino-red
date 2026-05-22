@@ -7,11 +7,11 @@ export function calculateTeamRanking(
   filter: string
 ) {
   const filteredPlayers = players.filter(
-    (player) => player.Dia === selectedDay
+    (player) => String(player.Dia) === String(selectedDay)
   )
 
   const filteredPlacements = placements.filter(
-    (placement) => placement.Dia === selectedDay
+    (placement) => String(placement.Dia) === String(selectedDay)
   )
 
   const teamsMap = new Map()
