@@ -9,6 +9,8 @@ import { MVPCard } from "@/components/tables/mvp-card"
 
 import { getPlayerBadges } from "@/lib/badges"
 
+import Link from "next/link"
+
 export default function JogadoresPage() {
   const [players, setPlayers] = useState<any[]>([])
 
@@ -183,7 +185,12 @@ export default function JogadoresPage() {
                 <div className="flex items-center gap-3">
 
                     <span>
+                    <Link
+                    href={`/jogadores/${encodeURIComponent(player.Jogador)}`}
+                    className="hover:text-red-500 transition"
+                    >
                     {player.Jogador}
+                    </Link>
                     </span>
 
                     <div className="flex gap-1">
