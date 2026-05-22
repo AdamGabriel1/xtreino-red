@@ -9,8 +9,7 @@ export function generateMessage(teams: string[]) {
     return `*📍 ${String(index + 1).padStart(2, "0")} — ${team}*`
   })
 
-  return `
-_*DEVILS MOBILE LEAGUE 🚩*_
+  return `_*DEVILS MOBILE LEAGUE 🚩*_
 
 _PLATAFORMA:_ *_MOBILE_* 📱
 _MODO:_ *_SQUAD_* 👥👥

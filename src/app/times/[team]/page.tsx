@@ -9,7 +9,8 @@ interface Props {
 export default async function TeamPage({
   params,
 }: Props) {
-  const resolvedParams = await params
+  const resolvedParams =
+    await params
 
   return (
     <TeamPageClient

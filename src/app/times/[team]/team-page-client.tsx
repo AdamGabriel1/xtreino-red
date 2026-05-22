@@ -10,7 +10,7 @@ import {
 
 import { loadCSV } from "@/lib/csv"
 
-import { calculateTeamDetails } from "@/lib/team-details"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 interface Props {
   teamName: string
@@ -22,8 +22,11 @@ export default function TeamPageClient({
   const [players, setPlayers] =
     useState<any[]>([])
 
+  const [selectedMonth, setSelectedMonth] =
+    useState("Todos")
+
   const [selectedDay, setSelectedDay] =
-    useState("19")
+    useState("Todos")
 
   useEffect(() => {
     async function loadData() {
@@ -37,23 +40,139 @@ export default function TeamPageClient({
     loadData()
   }, [])
 
-  const availableDays = useMemo(() => {
-    return [
-      ...new Set(players.map((p) => p.Dia)),
-    ]
-  }, [players])
+  // FILTRAR TIME
+  const teamPlayers =
+    useMemo(() => {
+      return players.filter(
+        (player) =>
+          player.Time === teamName
+      )
+    }, [players, teamName])
 
-  const details = useMemo(() => {
-    return calculateTeamDetails(
-      players,
-      teamName,
-      selectedDay
-    )
+  // MESES
+  const availableMonths =
+    useMemo(() => {
+      return [
+        "Todos",
+
+        ...new Set(
+          teamPlayers.map(
+            (player) =>
+              player.Mes
+          )
+        ),
+      ]
+    }, [teamPlayers])
+
+  // DIAS
+  const availableDays = useMemo(() => {
+    let filtered =
+      teamPlayers
+
+    if (selectedMonth !== "Todos") {
+      filtered = filtered.filter(
+        (player) =>
+          player.Mes ===
+          selectedMonth
+      )
+    }
+
+    return [
+      "Todos",
+
+      ...new Set(
+        filtered.map(
+          (player) =>
+            player.Dia
+        )
+      ),
+    ]
   }, [
-    players,
-    teamName,
-    selectedDay,
+    teamPlayers,
+    selectedMonth,
   ])
+
+  // FILTRADOS
+  const filteredPlayers =
+    useMemo(() => {
+      return teamPlayers.filter(
+        (player) => {
+
+          const monthMatch =
+            selectedMonth ===
+              "Todos" ||
+            player.Mes ===
+              selectedMonth
+
+          const dayMatch =
+            selectedDay ===
+              "Todos" ||
+            String(
+              player.Dia
+            ) ===
+              String(
+                selectedDay
+              )
+
+          return (
+            monthMatch &&
+            dayMatch
+          )
+        }
+      )
+    }, [
+      teamPlayers,
+      selectedMonth,
+      selectedDay,
+    ])
+
+  // STATS
+  const stats = useMemo(() => {
+
+    const uniquePlayers =
+      new Set(
+        filteredPlayers.map(
+          (player) =>
+            player.Jogador
+        )
+      ).size
+
+    const totalKills =
+      filteredPlayers.reduce(
+        (
+          acc,
+          player
+        ) =>
+          acc +
+          Number(
+            player.Q1_Kills ||
+              0
+          ) +
+          Number(
+            player.Q2_Kills ||
+              0
+          ) +
+          Number(
+            player.Q3_Kills ||
+              0
+          ),
+        0
+      )
+
+    const average =
+      uniquePlayers > 0
+        ? (
+            totalKills /
+            uniquePlayers
+          ).toFixed(1)
+        : "0.0"
+
+    return {
+      totalKills,
+      average,
+      uniquePlayers,
+    }
+  }, [filteredPlayers])
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -65,47 +184,63 @@ export default function TeamPageClient({
         ← Voltar
       </Link>
 
+      {/* HEADER */}
       <div className="bg-gradient-to-br from-red-950/20 to-black border border-zinc-800 rounded-3xl p-10 mb-10">
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
 
-          <div>
+          <div className="flex items-center gap-6">
 
-            <div className="inline-flex bg-red-600 px-4 py-2 rounded-xl font-bold mb-6">
-              EQUIPE
+            <TeamLogo
+              team={teamName}
+              size={100}
+            />
+
+            <div>
+
+              <div className="inline-flex bg-red-600 px-4 py-2 rounded-xl font-bold mb-6">
+                EQUIPE
+              </div>
+
+              <h1 className="text-5xl md:text-6xl font-black break-words">
+                {teamName}
+              </h1>
+
+              <p className="text-zinc-400 mt-4">
+                Perfil oficial da
+                equipe
+              </p>
+
             </div>
-
-            <h1 className="text-5xl md:text-6xl font-black break-words">
-              {teamName}
-            </h1>
-
-            <p className="text-zinc-400 mt-4 text-lg md:text-xl">
-              Perfil oficial da equipe
-            </p>
 
           </div>
 
+          {/* STATS */}
           <div className="grid grid-cols-2 gap-4">
 
-            <div className="bg-black/50 border border-zinc-800 rounded-2xl p-6 text-center min-w-[140px]">
+            <div className="bg-black/40 border border-zinc-800 rounded-2xl p-5 text-center">
 
-              <h2 className="text-4xl font-black text-red-500">
-                {details.totalKills}
-              </h2>
+              <div className="text-4xl font-black text-red-500">
+                {
+                  stats.totalKills
+                }
+              </div>
 
-              <p className="text-zinc-400 mt-2">
+              <p className="text-zinc-400 mt-2 text-sm">
                 KILLS
               </p>
 
             </div>
 
-            <div className="bg-black/50 border border-zinc-800 rounded-2xl p-6 text-center min-w-[140px]">
+            <div className="bg-black/40 border border-zinc-800 rounded-2xl p-5 text-center">
 
-              <h2 className="text-4xl font-black text-red-500">
-                {details.averageKills}
-              </h2>
+              <div className="text-4xl font-black text-red-500">
+                {
+                  stats.average
+                }
+              </div>
 
-              <p className="text-zinc-400 mt-2">
+              <p className="text-zinc-400 mt-2 text-sm">
                 MÉDIA
               </p>
 
@@ -117,74 +252,76 @@ export default function TeamPageClient({
 
       </div>
 
-      <div className="mb-8">
+      {/* FILTROS */}
+      <div className="flex flex-wrap gap-4 mb-8">
 
+        {/* MÊS */}
+        <select
+          value={selectedMonth}
+          onChange={(e) => {
+
+            setSelectedMonth(
+              e.target.value
+            )
+
+            setSelectedDay(
+              "Todos"
+            )
+          }}
+          className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3"
+        >
+
+          {availableMonths.map(
+            (month) => (
+              <option
+                key={month}
+                value={month}
+              >
+                {month}
+              </option>
+            )
+          )}
+
+        </select>
+
+        {/* DIA */}
         <select
           value={selectedDay}
           onChange={(e) =>
-            setSelectedDay(e.target.value)
+            setSelectedDay(
+              e.target.value
+            )
           }
-          className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-4 outline-none focus:border-red-600"
+          className="bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3"
         >
-          {availableDays.map((day) => (
-            <option
-              key={day}
-              value={day}
-            >
-              Dia {day}
-            </option>
-          ))}
+
+          {availableDays.map(
+            (day) => (
+              <option
+                key={day}
+                value={day}
+              >
+                {day === "Todos"
+                  ? "Todos os dias"
+                  : `Dia ${day}`}
+              </option>
+            )
+          )}
+
         </select>
 
       </div>
 
-      {details.mvp && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 mb-10">
-
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-
-            <div>
-
-              <div className="inline-flex bg-red-600 px-4 py-2 rounded-xl font-bold mb-4">
-                MVP DO TIME
-              </div>
-
-              <h2 className="text-4xl font-black break-words">
-                {details.mvp.Jogador}
-              </h2>
-
-              <p className="text-zinc-400 mt-3">
-                Melhor jogador da equipe
-              </p>
-
-            </div>
-
-            <div className="text-center">
-
-              <div className="text-6xl font-black text-red-500">
-                {details.mvp.totalKills}
-              </div>
-
-              <p className="text-zinc-400">
-                KILLS
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-      )}
-
+      {/* TABELA */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
 
         <div className="overflow-x-auto">
 
-          <table className="w-full min-w-[360px]">
+          <table className="w-full min-w-[900px]">
 
             <thead>
 
-              <tr className="border-b border-zinc-800 bg-black/20">
+              <tr className="border-b border-zinc-800">
 
                 <th className="text-left py-5 px-6">
                   JOGADOR
@@ -212,48 +349,72 @@ export default function TeamPageClient({
 
             <tbody>
 
-              {details.players.length > 0 ? (
-                details.players.map(
-                  (player: any) => (
+              {filteredPlayers.map(
+                (
+                  player: any,
+                  index
+                ) => {
+
+                  const total =
+                    Number(
+                      player.Q1_Kills ||
+                        0
+                    ) +
+                    Number(
+                      player.Q2_Kills ||
+                        0
+                    ) +
+                    Number(
+                      player.Q3_Kills ||
+                        0
+                    )
+
+                  return (
                     <tr
-                      key={player.Jogador}
+                      key={
+                        index
+                      }
                       className="border-b border-zinc-800 hover:bg-zinc-800/30 transition"
                     >
 
-                      <td className="py-5 px-6 font-bold whitespace-nowrap">
-                        {player.Jogador}
+                      <td className="py-5 px-6 font-bold">
+
+                        <Link
+                          href={`/jogadores/${encodeURIComponent(player.Jogador)}`}
+                          className="hover:text-red-500 transition"
+                        >
+                          {
+                            player.Jogador
+                          }
+                        </Link>
+
                       </td>
 
                       <td className="text-center">
-                        {player.Q1_Kills}
+                        {
+                          player.Q1_Kills
+                        }
                       </td>
 
                       <td className="text-center">
-                        {player.Q2_Kills}
+                        {
+                          player.Q2_Kills
+                        }
                       </td>
 
                       <td className="text-center">
-                        {player.Q3_Kills}
+                        {
+                          player.Q3_Kills
+                        }
                       </td>
 
-                      <td className="text-center text-red-500 font-black text-xl">
-                        {player.totalKills}
+                      <td className="text-center text-red-500 font-black">
+                        {total}
                       </td>
 
                     </tr>
                   )
-                )
-              ) : (
-                <tr>
-
-                  <td
-                    colSpan={5}
-                    className="text-center py-10 text-zinc-500"
-                  >
-                    Nenhum jogador encontrado.
-                  </td>
-
-                </tr>
+                }
               )}
 
             </tbody>
