@@ -40,6 +40,7 @@ export function Navbar() {
             <Link href="/">Home</Link>
             <Link href="/inscricoes">Inscrições</Link>
             <Link href="/classificacao">Classificação</Link>
+            <Link href="/ranking-geral">Ranking Geral</Link>
             <Link href="/jogadores">Jogadores</Link>
           </div>
         </div>
