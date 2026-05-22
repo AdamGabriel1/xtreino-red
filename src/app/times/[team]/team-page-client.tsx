@@ -180,7 +180,7 @@ export default function TeamPageClient({
 
         <div className="overflow-x-auto">
 
-          <table className="w-full min-w-[400px]">
+          <table className="w-full min-w-[360px]">
 
             <thead>
 

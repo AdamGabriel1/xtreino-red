@@ -139,7 +139,7 @@ export default function JogadoresPage() {
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
 
-        <table className="w-full min-w-[400px]">
+        <table className="w-full min-w-[360px]">
 
           <thead>
             <tr className="border-b border-zinc-800">

@@ -122,7 +122,7 @@ export default function ClassificacaoPage() {
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
 
-        <table className="w-full min-w-[400px]">
+        <table className="w-full min-w-[360px]">
 
           <thead>
             <tr className="border-b border-zinc-800 text-left">
@@ -170,7 +170,7 @@ export default function ClassificacaoPage() {
                   </Link>
 
                 </td>
-                
+
                 <td>{team.q1Kills}</td>
                 <td>{team.q2Kills}</td>
                 <td>{team.q3Kills}</td>
