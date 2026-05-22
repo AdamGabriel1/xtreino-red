@@ -7,6 +7,8 @@ import { loadCSV } from "@/lib/csv"
 import { calculateMVP } from "@/lib/mvp"
 import { MVPCard } from "@/components/tables/mvp-card"
 
+import { getPlayerBadges } from "@/lib/badges"
+
 export default function JogadoresPage() {
   const [players, setPlayers] = useState<any[]>([])
 
@@ -177,7 +179,27 @@ export default function JogadoresPage() {
                 </td>
 
                 <td className="font-bold">
-                  {player.Jogador}
+
+                <div className="flex items-center gap-3">
+
+                    <span>
+                    {player.Jogador}
+                    </span>
+
+                    <div className="flex gap-1">
+
+                    {getPlayerBadges(player).map(
+                        (badge) => (
+                        <span key={badge}>
+                            {badge}
+                        </span>
+                        )
+                    )}
+
+                    </div>
+
+                </div>
+
                 </td>
 
                 <td>

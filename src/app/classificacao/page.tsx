@@ -10,6 +10,8 @@ import { StatsCards } from "@/components/tables/stats-cards"
 
 import Link from "next/link"
 
+import { TeamLogo } from "@/components/ui/team-logo"
+
 export default function ClassificacaoPage() {
   const [players, setPlayers] = useState<any[]>([])
   const [placements, setPlacements] = useState<any[]>([])
@@ -160,13 +162,17 @@ export default function ClassificacaoPage() {
                   {index > 2 && `#${index + 1}`}
                 </td>
 
-                <td className="font-bold">
+                <td>
 
                   <Link
                     href={`/times/${encodeURIComponent(team.team)}`}
-                    className="hover:text-red-500 transition"
+                    className="flex items-center gap-4 font-bold hover:text-red-500 transition"
                   >
+
+                    <TeamLogo team={team.team} />
+
                     {team.team}
+
                   </Link>
 
                 </td>
